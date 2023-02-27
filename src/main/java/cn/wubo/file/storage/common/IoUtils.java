@@ -48,7 +48,7 @@ public class IoUtils {
         }
     }
 
-    public static byte[] close(InputStream is) {
+    public static void close(InputStream is) {
         try {
             is.close();
         } catch (IOException e) {
