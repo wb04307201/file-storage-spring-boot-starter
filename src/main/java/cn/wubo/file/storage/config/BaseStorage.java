@@ -5,9 +5,9 @@ import lombok.Data;
 @Data
 public class BaseStorage {
     /**
-     * 存储平台
+     * 平台别名（后续使用）
      */
-    private String platform = "";
+    private String alias = "";
     /**
      * 启用存储
      */
