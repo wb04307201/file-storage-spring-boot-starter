@@ -2,12 +2,15 @@ package cn.wubo.file.storage.common;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
 
 public class IoUtils {
+
+    /**
+     * 默认缓存大小 8192
+     */
+    public static final int DEFAULT_BUFFER_SIZE = 2 << 12;
 
     public static byte[] readBytes(MultipartFile multipartFile) {
         try (InputStream is = multipartFile.getInputStream()) {
@@ -53,6 +56,27 @@ public class IoUtils {
             is.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public static void writeToStream(File file, OutputStream os) throws IOException {
+        try (FileInputStream is = new FileInputStream(file)) {
+            byte[] bytes = new byte[DEFAULT_BUFFER_SIZE];
+            int len;
+            while ((len = is.read(bytes)) != -1) {
+                os.write(bytes, 0, len);
+            }
+            os.flush();
+        }
+    }
+
+    public static void writeToStream(byte[] bytes, OutputStream os) throws IOException {
+        int len = bytes.length;
+        int rem = len;
+        while (rem > 0) {
+            int n = Math.min(rem, DEFAULT_BUFFER_SIZE);
+            os.write(bytes, (len - rem), n);
+            rem -= n;
         }
     }
 }

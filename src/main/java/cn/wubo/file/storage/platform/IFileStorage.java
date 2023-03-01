@@ -1,27 +1,25 @@
 package cn.wubo.file.storage.platform;
 
 import cn.wubo.file.storage.core.FileInfo;
-import cn.wubo.file.storage.core.MultipartFileWrapper;
-import lombok.Data;
+import cn.wubo.file.storage.core.MultipartFileStorage;
 
 import java.io.InputStream;
 import java.util.function.Consumer;
 
 /**
- * 文件存储接口，对应各个平台
+ * 文件存储接口，对应各个平台的别名
  */
-@Data
-public interface FileStorage {
+public interface IFileStorage {
 
     /**
-     * 支持的平台
+     * 支持的平台别名
      */
-    Boolean supportPalform(String platform);
+    Boolean supportAlias(String alias);
 
     /**
      * 保存文件
      */
-    boolean save(FileInfo fileInfo, MultipartFileWrapper fileWrapper);
+    FileInfo save(MultipartFileStorage fileWrapper);
 
 
     /**
@@ -37,7 +35,7 @@ public interface FileStorage {
     /**
      * 下载文件
      */
-    void download(FileInfo fileInfo, Consumer<InputStream> consumer);
+    MultipartFileStorage download(FileInfo fileInfo);
 
     /**
      * 释放相关资源

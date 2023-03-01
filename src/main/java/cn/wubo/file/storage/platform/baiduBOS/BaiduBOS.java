@@ -1,13 +1,12 @@
-package cn.wubo.file.storage.config.aliyunOSS;
+package cn.wubo.file.storage.platform.baiduBOS;
 
-import cn.wubo.file.storage.config.BaseStorage;
 import lombok.Data;
 
 /**
- * 阿里云 OSS
+ * 百度云 BOS
  */
 @Data
-public class AliyunOSS extends BaseStorage {
+public class BaiduBOS {
     private String accessKey;
     private String secretKey;
     private String endPoint;

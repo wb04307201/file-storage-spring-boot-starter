@@ -1,13 +1,13 @@
-package cn.wubo.file.storage.config.huaweiOBS;
+package cn.wubo.file.storage.platform.aliyunOSS;
 
 import cn.wubo.file.storage.config.BaseStorage;
 import lombok.Data;
 
 /**
- * 华为云 OBS
+ * 阿里云 OSS
  */
 @Data
-public class HuaweiOBS extends BaseStorage {
+public class AliyunOSS extends BaseStorage {
     private String accessKey;
     private String secretKey;
     private String endPoint;

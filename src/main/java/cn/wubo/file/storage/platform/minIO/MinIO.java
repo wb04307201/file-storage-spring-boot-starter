@@ -1,12 +1,13 @@
-package cn.wubo.file.storage.config.baiduBOS;
+package cn.wubo.file.storage.platform.minIO;
 
+import cn.wubo.file.storage.config.BaseStorage;
 import lombok.Data;
 
 /**
- * 百度云 BOS
+ * MinIO
  */
 @Data
-public class BaiduBOS {
+public class MinIO extends BaseStorage {
     private String accessKey;
     private String secretKey;
     private String endPoint;

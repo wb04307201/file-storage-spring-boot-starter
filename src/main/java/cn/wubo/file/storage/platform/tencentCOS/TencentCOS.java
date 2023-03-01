@@ -1,4 +1,4 @@
-package cn.wubo.file.storage.config.tencentCOS;
+package cn.wubo.file.storage.platform.tencentCOS;
 
 import cn.wubo.file.storage.config.BaseStorage;
 import lombok.Data;

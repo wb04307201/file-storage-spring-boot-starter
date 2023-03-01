@@ -1,13 +1,13 @@
-package cn.wubo.file.storage.config.minIO;
+package cn.wubo.file.storage.platform.huaweiOBS;
 
 import cn.wubo.file.storage.config.BaseStorage;
 import lombok.Data;
 
 /**
- * MinIO
+ * 华为云 OBS
  */
 @Data
-public class MinIO extends BaseStorage {
+public class HuaweiOBS extends BaseStorage {
     private String accessKey;
     private String secretKey;
     private String endPoint;

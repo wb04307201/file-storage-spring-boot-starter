@@ -1,6 +1,7 @@
 package cn.wubo.file.storage.config;
 
 
+import cn.wubo.file.storage.core.FileStorageService;
 import cn.wubo.file.storage.platform.local.LocalFileStorage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -33,6 +34,11 @@ public class FileStorageConfiguration {
                     return localFileStorage;
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Bean
+    public FileStorageService fileStorageService() {
+        return new FileStorageService();
     }
 
 }

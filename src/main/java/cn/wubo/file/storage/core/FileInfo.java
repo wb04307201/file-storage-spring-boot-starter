@@ -2,11 +2,13 @@ package cn.wubo.file.storage.core;
 
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
 
 @Data
+@Accessors(chain = true)
 public class FileInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -42,19 +44,14 @@ public class FileInfo implements Serializable {
     private String path;
 
     /**
-     * 文件扩展名
-     */
-    private String ext;
-
-    /**
      * MIME 类型
      */
     private String contentType;
 
     /**
-     * 存储平台
+     * 别名
      */
-    private String platform;
+    private String alais;
 
     /**
      * 创建时间

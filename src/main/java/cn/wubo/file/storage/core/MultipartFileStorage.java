@@ -4,19 +4,22 @@ import cn.wubo.file.storage.common.IoUtils;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
 
 @Data
-public class MultipartFileWrapper implements MultipartFile {
+public class MultipartFileStorage implements MultipartFile {
+
+    private static final int BUFFER_SIZE = 8192;
 
     /**
-     * 存储平台
+     * 别名
      */
-    private String platform;
+    private String alais;
+    /**
+     * 存储路径
+     */
+    private String path;
     /**
      * 文件名
      */
@@ -34,23 +37,23 @@ public class MultipartFileWrapper implements MultipartFile {
      */
     private final byte[] bytes;
 
-    public MultipartFileWrapper(MultipartFile multipartFile) {
+    public MultipartFileStorage(MultipartFile multipartFile) {
         this(multipartFile.getName(), multipartFile.getOriginalFilename(), multipartFile.getContentType(), IoUtils.readBytes(multipartFile));
     }
 
-    public MultipartFileWrapper(File file) {
+    public MultipartFileStorage(File file) {
         this(file.getName(), null, null, IoUtils.readBytes(file));
     }
 
-    public MultipartFileWrapper(String name, byte[] bytes) {
+    public MultipartFileStorage(String name, byte[] bytes) {
         this(name, null, null, bytes);
     }
 
-    public MultipartFileWrapper(String name, InputStream is) {
+    public MultipartFileStorage(String name, InputStream is) {
         this(name, null, null, IoUtils.readBytes(is));
     }
 
-    public MultipartFileWrapper(String name, String originalFilename, String contentType, byte[] bytes) {
+    public MultipartFileStorage(String name, String originalFilename, String contentType, byte[] bytes) {
         this.name = (name != null ? name : "");
         this.originalFilename = (originalFilename != null ? originalFilename : "");
         this.contentType = contentType;
@@ -72,6 +75,10 @@ public class MultipartFileWrapper implements MultipartFile {
         return new ByteArrayInputStream(this.bytes);
     }
 
+    public void writeOutputStream(OutputStream os) throws IOException {
+        IoUtils.writeToStream(this.bytes, os);
+    }
+
     @Override
     public void transferTo(File dest) {
         try {
@@ -79,5 +86,15 @@ public class MultipartFileWrapper implements MultipartFile {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public MultipartFileStorage setAlais(String alais) {
+        this.alais = alais;
+        return this;
+    }
+
+    public MultipartFileStorage setPath(String path) {
+        this.path = path;
+        return this;
     }
 }
