@@ -2,6 +2,11 @@ package cn.wubo.file.storage.common;
 
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
+import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 public class FileUtils {
 
     /**
@@ -72,5 +77,45 @@ public class FileUtils {
      */
     public static <T> boolean arrayIsEmpty(T[] array) {
         return array == null || array.length == 0;
+    }
+
+    /**
+     * 根据文件扩展名获得MimeType
+     *
+     * @param filePath 文件路径或文件名
+     * @return MimeType
+     */
+    public static String getMimeType(String filePath) throws IOException {
+        return getMimeType(filePath, false);
+    }
+
+    /**
+     * 根据文件扩展名获得MimeType
+     *
+     * @param filePath  文件路径或文件名
+     * @param checkFile 是否检测本地文件
+     * @return MimeType
+     */
+    public static String getMimeType(String filePath, Boolean checkFile) throws IOException {
+        String contentType = URLConnection.getFileNameMap().getContentTypeFor(filePath);
+        if (null == contentType) {
+            // 补充一些常用的mimeType
+            if (StringUtils.endsWithIgnoreCase(filePath, ".css")) {
+                contentType = "text/css";
+            } else if (StringUtils.endsWithIgnoreCase(filePath, ".js")) {
+                contentType = "application/x-javascript";
+            } else if (StringUtils.endsWithIgnoreCase(filePath, ".rar")) {
+                contentType = "application/x-rar-compressed";
+            } else if (StringUtils.endsWithIgnoreCase(filePath, ".7z")) {
+                contentType = "application/x-7z-compressed";
+            }
+        }
+
+        // 补充
+        if (null == contentType && checkFile) {
+            contentType = Files.probeContentType(Paths.get(filePath));
+        }
+
+        return contentType;
     }
 }

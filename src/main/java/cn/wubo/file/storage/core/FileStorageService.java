@@ -1,40 +1,58 @@
 package cn.wubo.file.storage.core;
 
+import cn.wubo.file.storage.exception.FileStorageRuntimeException;
 import cn.wubo.file.storage.platform.IFileStorage;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Optional;
 
-public class FileStorageService {
+@Slf4j
+public class FileStorageService implements DisposableBean {
 
     @Autowired
-    List<IFileStorage> IFileStorageList;
+    List<IFileStorage> fileStorageList;
 
-    private IFileStorage findAlias(String alias) {
-        Optional<IFileStorage> fileStorageOptional = IFileStorageList.stream()
+    private IFileStorage getFileStorage(String alias) {
+        Optional<IFileStorage> fileStorageOptional = fileStorageList.stream()
                 .filter(fileStorage -> fileStorage.supportAlias(alias))
                 .findAny();
         if (fileStorageOptional.isPresent()) {
-            return fileStorageOptional.get();
+            IFileStorage fileStorage = fileStorageOptional.get();
+            log.debug("找到存储 {} 成功", fileStorage.getPlatformAlias());
+            return fileStorage;
         } else {
-            throw new RuntimeException();
+            throw new FileStorageRuntimeException(String.format("未找到别名【%s】对应的平台配置",alias));
         }
     }
 
     public FileInfo save(MultipartFileStorage fileWrapper) {
-        return findAlias(fileWrapper.getAlais()).save(fileWrapper);
+        return getFileStorage(fileWrapper.getAlais()).save(fileWrapper);
     }
 
     public Boolean delete(FileInfo fileInfo) {
-        return findAlias(fileInfo.getAlais()).delete(fileInfo);
+        return getFileStorage(fileInfo.getAlais()).delete(fileInfo);
     }
 
     public Boolean exists(FileInfo fileInfo) {
-        return findAlias(fileInfo.getAlais()).exists(fileInfo);
+        return getFileStorage(fileInfo.getAlais()).exists(fileInfo);
     }
 
     public MultipartFileStorage download(FileInfo fileInfo) {
-        return findAlias(fileInfo.getAlais()).download(fileInfo);
+        return getFileStorage(fileInfo.getAlais()).download(fileInfo);
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        for (IFileStorage fileStorage : fileStorageList) {
+            try {
+                fileStorage.close();
+                log.debug("销毁存储 {} 成功", fileStorage.getPlatformAlias());
+            } catch (Exception e) {
+                log.error("销毁存储 {} 失败，{}", fileStorage.getPlatformAlias(), e.getMessage(), e);
+            }
+        }
     }
 }

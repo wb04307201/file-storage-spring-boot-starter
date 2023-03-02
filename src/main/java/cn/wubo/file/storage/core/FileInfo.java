@@ -1,14 +1,16 @@
 package cn.wubo.file.storage.core;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.experimental.Accessors;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Date;
 
 @Data
-@Accessors(chain = true)
+@NoArgsConstructor
+@AllArgsConstructor
 public class FileInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -57,4 +59,16 @@ public class FileInfo implements Serializable {
      * 创建时间
      */
     private Date createTime;
+
+    public FileInfo(String url, String filename,String basePath,MultipartFileStorage fileWrapper) {
+        this.url = url;
+        this.size = fileWrapper.getSize();
+        this.filename = filename;
+        this.originalFilename = fileWrapper.getOriginalFilename();
+        this.basePath = basePath;
+        this.path = fileWrapper.getPath();
+        this.contentType = fileWrapper.getContentType();
+        this.alais = fileWrapper.getAlais();
+        this.createTime = new Date();
+    }
 }

@@ -1,6 +1,6 @@
 package cn.wubo.file.storage.platform.local;
 
-import cn.wubo.file.storage.config.BaseStorage;
+import cn.wubo.file.storage.platform.BaseStorage;
 import lombok.Data;
 
 /**
