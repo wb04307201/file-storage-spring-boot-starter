@@ -16,7 +16,7 @@ import java.nio.file.Paths;
  */
 @Slf4j
 public class LocalFileStorage extends BaseFileStorage {
-    /* 本地存储路径*/
+
     private String storagePath;
 
     public LocalFileStorage(Local prop) {
