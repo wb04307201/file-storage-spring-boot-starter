@@ -23,7 +23,7 @@ public class MultipartFileStorage implements MultipartFile {
     /**
      * 存储路径
      */
-    private String path;
+    private String path = "";
     /**
      * 文件名
      */
@@ -93,6 +93,8 @@ public class MultipartFileStorage implements MultipartFile {
     @Override
     public void transferTo(File dest) {
         try {
+            Files.createDirectories(dest.toPath().getParent());
+            Files.createFile(dest.toPath());
             Files.write(dest.toPath(), bytes);
         } catch (IOException e) {
             throw new IORuntimeException(e.getMessage(), e);

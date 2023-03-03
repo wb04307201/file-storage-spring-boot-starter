@@ -4,16 +4,18 @@ import cn.wubo.file.storage.exception.FileStorageRuntimeException;
 import cn.wubo.file.storage.platform.IFileStorage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Slf4j
 public class FileStorageService implements DisposableBean {
 
-    @Autowired
-    List<IFileStorage> fileStorageList;
+    CopyOnWriteArrayList<IFileStorage> fileStorageList;
+
+    public FileStorageService(CopyOnWriteArrayList<IFileStorage> fileStorageList) {
+        this.fileStorageList = fileStorageList;
+    }
 
     private IFileStorage getFileStorage(String alias) {
         Optional<IFileStorage> fileStorageOptional = fileStorageList.stream()

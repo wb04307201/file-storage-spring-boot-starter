@@ -27,7 +27,7 @@ public class LocalFileStorage extends BaseFileStorage {
     @Override
     public FileInfo save(MultipartFileStorage fileWrapper) {
         String fileName = FileUtils.getRandomFileName(fileWrapper.getOriginalFilename());
-        String filePath = basePath + fileWrapper.getPath() + fileName;
+        String filePath = Paths.get(basePath, fileWrapper.getPath(), fileName).toString();
         fileWrapper.transferTo(Paths.get(this.storagePath, filePath).toFile());
         return new FileInfo(domain + filePath, fileName, basePath, fileWrapper);
     }

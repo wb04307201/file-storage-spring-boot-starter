@@ -2,6 +2,7 @@ package cn.wubo.file.storage.config;
 
 
 import cn.wubo.file.storage.core.FileStorageService;
+import cn.wubo.file.storage.platform.IFileStorage;
 import cn.wubo.file.storage.platform.aliyunOSS.AliyunOSSFileStorage;
 import cn.wubo.file.storage.platform.baiduBOS.BaiduBOSFileStorage;
 import cn.wubo.file.storage.platform.base.BasePlatform;
@@ -16,8 +17,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 @Configuration
@@ -112,8 +114,14 @@ public class FileStorageConfiguration {
     }
 
     @Bean
-    public FileStorageService fileStorageService() {
-        return new FileStorageService();
+    public FileStorageService fileStorageService(List<List<? extends IFileStorage>> fileStorageLists) {
+        return new FileStorageService(
+                new CopyOnWriteArrayList<>(
+                        fileStorageLists.stream()
+                                .flatMap(Collection::stream)
+                                .collect(Collectors.toList())
+                )
+        );
     }
 
 }

@@ -4,6 +4,9 @@ import cn.wubo.file.storage.core.FileInfo;
 import cn.wubo.file.storage.platform.IFileStorage;
 import cn.wubo.file.storage.utils.PathUtils;
 
+import java.io.File;
+import java.nio.file.Paths;
+
 public abstract class BaseFileStorage implements IFileStorage {
 
     /**
@@ -52,7 +55,7 @@ public abstract class BaseFileStorage implements IFileStorage {
 
 
     @Override
-    public String getFilePath(FileInfo fileInfo){
-        return basePath + fileInfo.getPath() + fileInfo.getFilename();
+    public String getFilePath(FileInfo fileInfo) {
+        return Paths.get(basePath, fileInfo.getPath(), fileInfo.getFilename()).toString();
     }
 }

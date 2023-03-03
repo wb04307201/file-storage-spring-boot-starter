@@ -121,6 +121,6 @@ public class FileUtils {
     }
 
     public static String getRandomFileName(String originalFilename) {
-        return UUID.randomUUID() + FileUtils.extName(originalFilename);
+        return UUID.randomUUID() + DOT + FileUtils.extName(originalFilename);
     }
 }
