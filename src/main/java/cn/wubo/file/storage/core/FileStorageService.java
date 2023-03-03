@@ -29,19 +29,19 @@ public class FileStorageService implements DisposableBean {
     }
 
     public FileInfo save(MultipartFileStorage fileWrapper) {
-        return getFileStorage(fileWrapper.getAlais()).save(fileWrapper);
+        return getFileStorage(fileWrapper.getAlias()).save(fileWrapper);
     }
 
     public Boolean delete(FileInfo fileInfo) {
-        return getFileStorage(fileInfo.getAlais()).delete(fileInfo);
+        return getFileStorage(fileInfo.getAlias()).delete(fileInfo);
     }
 
     public Boolean exists(FileInfo fileInfo) {
-        return getFileStorage(fileInfo.getAlais()).exists(fileInfo);
+        return getFileStorage(fileInfo.getAlias()).exists(fileInfo);
     }
 
     public MultipartFileStorage download(FileInfo fileInfo) {
-        return getFileStorage(fileInfo.getAlais()).download(fileInfo);
+        return getFileStorage(fileInfo.getAlias()).download(fileInfo);
     }
 
     @Override
