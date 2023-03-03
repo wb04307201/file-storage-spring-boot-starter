@@ -16,10 +16,10 @@ import java.io.InputStream;
 @Slf4j
 public class WebDAVFileStorage extends BaseFileStorage {
 
-    private String server;
-    private String user;
-    private String password;
-    private String storagePath;
+    private final String server;
+    private final String user;
+    private final String password;
+    private final String storagePath;
     private Sardine client;
 
     public WebDAVFileStorage(WebDAV prop) {

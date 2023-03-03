@@ -17,7 +17,7 @@ public class PathUtils {
     }
 
     /**
-     * 合并路径
+     * 合并url
      */
     public static String join(String... paths) {
         StringBuilder sb = new StringBuilder();

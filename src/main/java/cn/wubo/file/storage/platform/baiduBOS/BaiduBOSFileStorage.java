@@ -17,10 +17,10 @@ import java.io.InputStream;
 
 public class BaiduBOSFileStorage extends BaseFileStorage {
 
-    private String accessKey;
-    private String secretKey;
-    private String endPoint;
-    private String bucketName;
+    private final String accessKey;
+    private final String secretKey;
+    private final String endPoint;
+    private final String bucketName;
     private BosClient client;
 
     public BaiduBOSFileStorage(BaiduBOS prop) {

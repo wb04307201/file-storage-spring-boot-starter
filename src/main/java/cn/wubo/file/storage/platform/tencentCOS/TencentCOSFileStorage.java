@@ -19,10 +19,10 @@ import java.io.InputStream;
 
 public class TencentCOSFileStorage extends BaseFileStorage {
 
-    private String secretId;
-    private String secretKey;
-    private String region;
-    private String bucketName;
+    private final String secretId;
+    private final String secretKey;
+    private final String region;
+    private final String bucketName;
     private COSClient client;
 
     public TencentCOSFileStorage(TencentCOS prop) {

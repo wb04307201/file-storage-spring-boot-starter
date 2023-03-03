@@ -17,10 +17,10 @@ import java.io.InputStream;
 @Slf4j
 public class HuaweiOBSFileStorage extends BaseFileStorage {
 
-    private String accessKey;
-    private String secretKey;
-    private String endPoint;
-    private String bucketName;
+    private final String accessKey;
+    private final String secretKey;
+    private final String endPoint;
+    private final String bucketName;
     private ObsClient client;
 
     public HuaweiOBSFileStorage(HuaweiOBS prop) {

@@ -53,6 +53,6 @@ public abstract class BaseFileStorage implements IFileStorage {
 
     @Override
     public String getFilePath(FileInfo fileInfo){
-        return PathUtils.join(basePath,fileInfo.getPath(),fileInfo.getFilename());
+        return basePath + fileInfo.getPath() + fileInfo.getFilename();
     }
 }
