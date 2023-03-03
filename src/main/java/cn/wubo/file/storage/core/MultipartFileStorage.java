@@ -1,7 +1,7 @@
 package cn.wubo.file.storage.core;
 
-import cn.wubo.file.storage.common.FileUtils;
-import cn.wubo.file.storage.common.IoUtils;
+import cn.wubo.file.storage.utils.FileUtils;
+import cn.wubo.file.storage.utils.IoUtils;
 import cn.wubo.file.storage.exception.IORuntimeException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;

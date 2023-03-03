@@ -1,39 +1,44 @@
-package cn.wubo.file.storage.platform.huaweiOBS;
+package cn.wubo.file.storage.platform.tencentCOS;
 
 import cn.wubo.file.storage.utils.FileUtils;
-import cn.wubo.file.storage.utils.IoUtils;
 import cn.wubo.file.storage.core.FileInfo;
 import cn.wubo.file.storage.core.MultipartFileStorage;
 import cn.wubo.file.storage.exception.FileStorageRuntimeException;
 import cn.wubo.file.storage.platform.base.BaseFileStorage;
-import com.obs.services.ObsClient;
-import com.obs.services.model.ObjectMetadata;
-import com.obs.services.model.ObsObject;
-import lombok.extern.slf4j.Slf4j;
+import com.qcloud.cos.COSClient;
+import com.qcloud.cos.ClientConfig;
+import com.qcloud.cos.auth.BasicCOSCredentials;
+import com.qcloud.cos.auth.COSCredentials;
+import com.qcloud.cos.http.HttpProtocol;
+import com.qcloud.cos.model.COSObject;
+import com.qcloud.cos.model.ObjectMetadata;
+import com.qcloud.cos.region.Region;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-@Slf4j
-public class HuaweiOBSFileStorage extends BaseFileStorage {
+public class TencentCOSFileStorage extends BaseFileStorage {
 
-    private String accessKey;
+    private String secretId;
     private String secretKey;
-    private String endPoint;
+    private String region;
     private String bucketName;
-    private ObsClient client;
+    private COSClient client;
 
-    public HuaweiOBSFileStorage(HuaweiOBS prop) {
-        super(prop.getBasePath(), prop.getDomain(), prop.getAlias(), "HuaweiOBS");
-        this.accessKey = prop.getAccessKey();
+    public TencentCOSFileStorage(TencentCOS prop) {
+        super(prop.getBasePath(), prop.getDomain(), prop.getAlias(), "TencentCOS");
+        this.secretId = prop.getSecretId();
         this.secretKey = prop.getSecretKey();
-        this.endPoint = prop.getEndPoint();
+        this.region = prop.getRegion();
         this.bucketName = prop.getBucketName();
     }
 
-    private ObsClient getClient() {
+    private COSClient getClient() {
         if (client == null) {
-            client = new ObsClient(accessKey, secretKey, endPoint);
+            COSCredentials cred = new BasicCOSCredentials(secretId, secretKey);
+            ClientConfig clientConfig = new ClientConfig(new Region(region));
+            clientConfig.setHttpProtocol(HttpProtocol.https);
+            client = new COSClient(cred, clientConfig);
         }
         return client;
     }
@@ -49,11 +54,7 @@ public class HuaweiOBSFileStorage extends BaseFileStorage {
             metadata.setContentType(fileWrapper.getContentType());
             getClient().putObject(bucketName, filePath, is, metadata);
         } catch (IOException e) {
-            try {
-                getClient().deleteObject(bucketName, filePath);
-            } catch (Exception ex) {
-                log.error(ex.getMessage(), ex);
-            }
+            getClient().deleteObject(bucketName, filePath);
             throw new FileStorageRuntimeException(String.format("存储文件失败,%s", e.getMessage()), e);
         }
 
@@ -63,7 +64,7 @@ public class HuaweiOBSFileStorage extends BaseFileStorage {
     @Override
     public boolean delete(FileInfo fileInfo) {
         if (exists(fileInfo)) getClient().deleteObject(bucketName, getFilePath(fileInfo));
-        return true;
+        return false;
     }
 
     @Override
@@ -73,7 +74,7 @@ public class HuaweiOBSFileStorage extends BaseFileStorage {
 
     @Override
     public MultipartFileStorage download(FileInfo fileInfo) {
-        ObsObject object = getClient().getObject(bucketName, getFilePath(fileInfo));
+        COSObject object = getClient().getObject(bucketName, fileInfo.getBasePath() + fileInfo.getPath() + fileInfo.getFilename());
         try (InputStream is = object.getObjectContent()) {
             return new MultipartFileStorage(fileInfo.getFilename(), is);
         } catch (IOException e) {
@@ -83,6 +84,9 @@ public class HuaweiOBSFileStorage extends BaseFileStorage {
 
     @Override
     public void close() {
-        IoUtils.close(client);
+        if (client != null) {
+            client.shutdown();
+            client = null;
+        }
     }
 }

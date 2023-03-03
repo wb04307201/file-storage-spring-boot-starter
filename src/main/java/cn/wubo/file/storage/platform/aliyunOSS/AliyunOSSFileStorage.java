@@ -1,39 +1,37 @@
-package cn.wubo.file.storage.platform.huaweiOBS;
+package cn.wubo.file.storage.platform.aliyunOSS;
 
 import cn.wubo.file.storage.utils.FileUtils;
-import cn.wubo.file.storage.utils.IoUtils;
 import cn.wubo.file.storage.core.FileInfo;
 import cn.wubo.file.storage.core.MultipartFileStorage;
 import cn.wubo.file.storage.exception.FileStorageRuntimeException;
 import cn.wubo.file.storage.platform.base.BaseFileStorage;
-import com.obs.services.ObsClient;
-import com.obs.services.model.ObjectMetadata;
-import com.obs.services.model.ObsObject;
-import lombok.extern.slf4j.Slf4j;
+import com.aliyun.oss.OSS;
+import com.aliyun.oss.OSSClientBuilder;
+import com.aliyun.oss.model.OSSObject;
+import com.aliyun.oss.model.ObjectMetadata;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-@Slf4j
-public class HuaweiOBSFileStorage extends BaseFileStorage {
 
+public class AliyunOSSFileStorage extends BaseFileStorage {
     private String accessKey;
     private String secretKey;
     private String endPoint;
     private String bucketName;
-    private ObsClient client;
+    private OSS client;
 
-    public HuaweiOBSFileStorage(HuaweiOBS prop) {
-        super(prop.getBasePath(), prop.getDomain(), prop.getAlias(), "HuaweiOBS");
+    public AliyunOSSFileStorage(AliyunOSS prop) {
+        super(prop.getBasePath(), prop.getDomain(), prop.getAlias(), "BaiduBOS");
         this.accessKey = prop.getAccessKey();
         this.secretKey = prop.getSecretKey();
         this.endPoint = prop.getEndPoint();
         this.bucketName = prop.getBucketName();
     }
 
-    private ObsClient getClient() {
+    private OSS getClient() {
         if (client == null) {
-            client = new ObsClient(accessKey, secretKey, endPoint);
+            client = new OSSClientBuilder().build(endPoint, accessKey, secretKey);
         }
         return client;
     }
@@ -49,11 +47,7 @@ public class HuaweiOBSFileStorage extends BaseFileStorage {
             metadata.setContentType(fileWrapper.getContentType());
             getClient().putObject(bucketName, filePath, is, metadata);
         } catch (IOException e) {
-            try {
-                getClient().deleteObject(bucketName, filePath);
-            } catch (Exception ex) {
-                log.error(ex.getMessage(), ex);
-            }
+            getClient().deleteObject(bucketName, filePath);
             throw new FileStorageRuntimeException(String.format("存储文件失败,%s", e.getMessage()), e);
         }
 
@@ -63,7 +57,7 @@ public class HuaweiOBSFileStorage extends BaseFileStorage {
     @Override
     public boolean delete(FileInfo fileInfo) {
         if (exists(fileInfo)) getClient().deleteObject(bucketName, getFilePath(fileInfo));
-        return true;
+        return false;
     }
 
     @Override
@@ -73,7 +67,7 @@ public class HuaweiOBSFileStorage extends BaseFileStorage {
 
     @Override
     public MultipartFileStorage download(FileInfo fileInfo) {
-        ObsObject object = getClient().getObject(bucketName, getFilePath(fileInfo));
+        OSSObject object = getClient().getObject(bucketName, fileInfo.getBasePath() + fileInfo.getPath() + fileInfo.getFilename());
         try (InputStream is = object.getObjectContent()) {
             return new MultipartFileStorage(fileInfo.getFilename(), is);
         } catch (IOException e) {
@@ -83,6 +77,9 @@ public class HuaweiOBSFileStorage extends BaseFileStorage {
 
     @Override
     public void close() {
-        IoUtils.close(client);
+        if (client != null) {
+            client.shutdown();
+            client = null;
+        }
     }
 }

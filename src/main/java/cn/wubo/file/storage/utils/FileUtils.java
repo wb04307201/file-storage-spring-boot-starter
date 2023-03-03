@@ -1,4 +1,4 @@
-package cn.wubo.file.storage.common;
+package cn.wubo.file.storage.utils;
 
 import org.springframework.util.StringUtils;
 
@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 public class FileUtils {
 
@@ -117,5 +118,9 @@ public class FileUtils {
         }
 
         return contentType;
+    }
+
+    public static String getRandomFileName(String originalFilename) {
+        return UUID.randomUUID() + FileUtils.extName(originalFilename);
     }
 }

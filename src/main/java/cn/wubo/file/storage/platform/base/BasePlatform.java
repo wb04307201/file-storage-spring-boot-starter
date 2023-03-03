@@ -1,9 +1,9 @@
-package cn.wubo.file.storage.platform;
+package cn.wubo.file.storage.platform.base;
 
 import lombok.Data;
 
 @Data
-public class BaseStorage {
+public class BasePlatform {
     /**
      * 平台别名（后续使用）
      */

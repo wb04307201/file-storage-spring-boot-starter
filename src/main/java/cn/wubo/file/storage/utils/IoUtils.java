@@ -1,10 +1,13 @@
-package cn.wubo.file.storage.common;
+package cn.wubo.file.storage.utils;
 
+import cn.wubo.file.storage.exception.IORuntimeException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.nio.file.Files;
 
+@Slf4j
 public class IoUtils {
 
     /**
@@ -24,7 +27,7 @@ public class IoUtils {
         try {
             return Files.readAllBytes(file.toPath());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new IORuntimeException(e.getMessage(), e);
         }
     }
 
@@ -43,7 +46,7 @@ public class IoUtils {
             }
             return result;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new IORuntimeException(e.getMessage(), e);
         } finally {
             if (isClose) {
                 close(is);
@@ -51,11 +54,13 @@ public class IoUtils {
         }
     }
 
-    public static void close(InputStream is) {
-        try {
-            is.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    public static void close(Closeable closeable) {
+        if (closeable != null) {
+            try {
+                closeable.close();
+            } catch (IOException e) {
+                log.debug(e.getMessage(), e);
+            }
         }
     }
 

@@ -1,7 +1,8 @@
-package cn.wubo.file.storage.platform;
+package cn.wubo.file.storage.platform.base;
 
 import cn.wubo.file.storage.core.FileInfo;
-import cn.wubo.file.storage.core.MultipartFileStorage;
+import cn.wubo.file.storage.platform.IFileStorage;
+import cn.wubo.file.storage.utils.PathUtils;
 
 public abstract class BaseFileStorage implements IFileStorage {
 
@@ -25,7 +26,7 @@ public abstract class BaseFileStorage implements IFileStorage {
      */
     protected String platform;
 
-    public BaseFileStorage(String basePath, String domain, String alias, String platform) {
+    protected BaseFileStorage(String basePath, String domain, String alias, String platform) {
         this.basePath = basePath;
         this.domain = domain;
         this.alias = alias;
@@ -52,6 +53,6 @@ public abstract class BaseFileStorage implements IFileStorage {
 
     @Override
     public String getFilePath(FileInfo fileInfo){
-        return basePath + fileInfo.getPath() + fileInfo.getFilename();
+        return PathUtils.join(basePath,fileInfo.getPath(),fileInfo.getFilename());
     }
 }

@@ -1,16 +1,15 @@
 package cn.wubo.file.storage.platform.local;
 
-import cn.wubo.file.storage.common.FileUtils;
+import cn.wubo.file.storage.utils.FileUtils;
 import cn.wubo.file.storage.core.FileInfo;
 import cn.wubo.file.storage.core.MultipartFileStorage;
 import cn.wubo.file.storage.exception.IORuntimeException;
-import cn.wubo.file.storage.platform.BaseFileStorage;
+import cn.wubo.file.storage.platform.base.BaseFileStorage;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.UUID;
 
 /**
  * 本地文件存储升级版
@@ -21,13 +20,13 @@ public class LocalFileStorage extends BaseFileStorage {
     private String storagePath;
 
     public LocalFileStorage(Local prop) {
-        super(prop.getBasePath(), prop.getDomain(), prop.getAlias(), "local");
+        super(prop.getBasePath(), prop.getDomain(), prop.getAlias(), "Local");
         this.storagePath = prop.getStoragePath();
     }
 
     @Override
     public FileInfo save(MultipartFileStorage fileWrapper) {
-        String fileName = UUID.randomUUID() + FileUtils.extName(fileWrapper.getOriginalFilename());
+        String fileName = FileUtils.getRandomFileName(fileWrapper.getOriginalFilename());
         String filePath = basePath + fileWrapper.getPath() + fileName;
         fileWrapper.transferTo(Paths.get(this.storagePath, filePath).toFile());
         return new FileInfo(domain + filePath, fileName, basePath, fileWrapper);

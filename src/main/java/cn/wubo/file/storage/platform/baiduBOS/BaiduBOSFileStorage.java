@@ -1,39 +1,43 @@
-package cn.wubo.file.storage.platform.huaweiOBS;
+package cn.wubo.file.storage.platform.baiduBOS;
 
 import cn.wubo.file.storage.utils.FileUtils;
-import cn.wubo.file.storage.utils.IoUtils;
 import cn.wubo.file.storage.core.FileInfo;
 import cn.wubo.file.storage.core.MultipartFileStorage;
 import cn.wubo.file.storage.exception.FileStorageRuntimeException;
 import cn.wubo.file.storage.platform.base.BaseFileStorage;
-import com.obs.services.ObsClient;
-import com.obs.services.model.ObjectMetadata;
-import com.obs.services.model.ObsObject;
-import lombok.extern.slf4j.Slf4j;
+import com.baidubce.Protocol;
+import com.baidubce.auth.DefaultBceCredentials;
+import com.baidubce.services.bos.BosClient;
+import com.baidubce.services.bos.BosClientConfiguration;
+import com.baidubce.services.bos.model.BosObject;
+import com.baidubce.services.bos.model.ObjectMetadata;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-@Slf4j
-public class HuaweiOBSFileStorage extends BaseFileStorage {
+public class BaiduBOSFileStorage extends BaseFileStorage {
 
     private String accessKey;
     private String secretKey;
     private String endPoint;
     private String bucketName;
-    private ObsClient client;
+    private BosClient client;
 
-    public HuaweiOBSFileStorage(HuaweiOBS prop) {
-        super(prop.getBasePath(), prop.getDomain(), prop.getAlias(), "HuaweiOBS");
+    public BaiduBOSFileStorage(BaiduBOS prop) {
+        super(prop.getBasePath(), prop.getDomain(), prop.getAlias(), "BaiduBOS");
         this.accessKey = prop.getAccessKey();
         this.secretKey = prop.getSecretKey();
         this.endPoint = prop.getEndPoint();
         this.bucketName = prop.getBucketName();
     }
 
-    private ObsClient getClient() {
+    private BosClient getClient() {
         if (client == null) {
-            client = new ObsClient(accessKey, secretKey, endPoint);
+            BosClientConfiguration config = new BosClientConfiguration();
+            config.setCredentials(new DefaultBceCredentials(accessKey, secretKey));
+            config.setEndpoint(endPoint);
+            config.setProtocol(Protocol.HTTPS);
+            client = new BosClient(config);
         }
         return client;
     }
@@ -49,11 +53,7 @@ public class HuaweiOBSFileStorage extends BaseFileStorage {
             metadata.setContentType(fileWrapper.getContentType());
             getClient().putObject(bucketName, filePath, is, metadata);
         } catch (IOException e) {
-            try {
-                getClient().deleteObject(bucketName, filePath);
-            } catch (Exception ex) {
-                log.error(ex.getMessage(), ex);
-            }
+            getClient().deleteObject(bucketName, filePath);
             throw new FileStorageRuntimeException(String.format("存储文件失败,%s", e.getMessage()), e);
         }
 
@@ -73,7 +73,7 @@ public class HuaweiOBSFileStorage extends BaseFileStorage {
 
     @Override
     public MultipartFileStorage download(FileInfo fileInfo) {
-        ObsObject object = getClient().getObject(bucketName, getFilePath(fileInfo));
+        BosObject object = getClient().getObject(bucketName, getFilePath(fileInfo));
         try (InputStream is = object.getObjectContent()) {
             return new MultipartFileStorage(fileInfo.getFilename(), is);
         } catch (IOException e) {
@@ -83,6 +83,9 @@ public class HuaweiOBSFileStorage extends BaseFileStorage {
 
     @Override
     public void close() {
-        IoUtils.close(client);
+        if (client != null) {
+            client.shutdown();
+            client = null;
+        }
     }
 }
