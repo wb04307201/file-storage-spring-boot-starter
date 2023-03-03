@@ -53,7 +53,7 @@ public class FileInfo implements Serializable {
     /**
      * 别名
      */
-    private String alais;
+    private String alias;
 
     /**
      * 创建时间
@@ -68,7 +68,7 @@ public class FileInfo implements Serializable {
         this.basePath = basePath;
         this.path = fileWrapper.getPath();
         this.contentType = fileWrapper.getContentType();
-        this.alais = fileWrapper.getAlais();
+        this.alias = fileWrapper.getAlias();
         this.createTime = new Date();
     }
 }

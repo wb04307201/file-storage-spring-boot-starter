@@ -19,7 +19,7 @@ public class MultipartFileStorage implements MultipartFile {
     /**
      * 别名
      */
-    private String alais;
+    private String alias;
     /**
      * 存储路径
      */
@@ -99,8 +99,8 @@ public class MultipartFileStorage implements MultipartFile {
         }
     }
 
-    public MultipartFileStorage setAlais(String alais) {
-        this.alais = alais;
+    public MultipartFileStorage setAlias(String alias) {
+        this.alias = alias;
         return this;
     }
 
