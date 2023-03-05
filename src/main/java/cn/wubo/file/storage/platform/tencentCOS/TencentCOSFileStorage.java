@@ -16,6 +16,7 @@ import com.qcloud.cos.region.Region;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.UUID;
 
 public class TencentCOSFileStorage extends BaseFileStorage {
 
@@ -58,7 +59,7 @@ public class TencentCOSFileStorage extends BaseFileStorage {
             throw new FileStorageRuntimeException(String.format("存储文件失败,%s", e.getMessage()), e);
         }
 
-        return new FileInfo(domain + filePath, fileName, basePath, fileWrapper);
+        return new FileInfo(UUID.randomUUID().toString(), domain + filePath, fileName, basePath, fileWrapper);
     }
 
     @Override

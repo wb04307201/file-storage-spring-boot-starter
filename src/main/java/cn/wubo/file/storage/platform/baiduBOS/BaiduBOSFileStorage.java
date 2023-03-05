@@ -14,6 +14,7 @@ import com.baidubce.services.bos.model.ObjectMetadata;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.UUID;
 
 public class BaiduBOSFileStorage extends BaseFileStorage {
 
@@ -57,7 +58,7 @@ public class BaiduBOSFileStorage extends BaseFileStorage {
             throw new FileStorageRuntimeException(String.format("存储文件失败,%s", e.getMessage()), e);
         }
 
-        return new FileInfo(domain + filePath, fileName, basePath, fileWrapper);
+        return new FileInfo(UUID.randomUUID().toString(), domain + filePath, fileName, basePath, fileWrapper);
     }
 
     @Override

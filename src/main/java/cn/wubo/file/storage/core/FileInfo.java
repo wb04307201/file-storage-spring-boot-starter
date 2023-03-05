@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -14,6 +15,8 @@ import java.util.Date;
 public class FileInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    private String id;
 
     /**
      * 文件访问地址
@@ -70,5 +73,19 @@ public class FileInfo implements Serializable {
         this.contentType = fileWrapper.getContentType();
         this.alias = fileWrapper.getAlias();
         this.createTime = new Date();
+        this.id = UUID.randomUUID().toString();
+    }
+
+    public FileInfo(String id,String url, String filename,String basePath,MultipartFileStorage fileWrapper) {
+        this.url = url;
+        this.size = fileWrapper.getSize();
+        this.filename = filename;
+        this.originalFilename = fileWrapper.getOriginalFilename();
+        this.basePath = basePath;
+        this.path = fileWrapper.getPath();
+        this.contentType = fileWrapper.getContentType();
+        this.alias = fileWrapper.getAlias();
+        this.createTime = new Date();
+        this.id = id;
     }
 }

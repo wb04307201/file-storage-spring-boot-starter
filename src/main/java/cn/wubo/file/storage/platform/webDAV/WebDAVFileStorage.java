@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.UUID;
 
 @Slf4j
 public class WebDAVFileStorage extends BaseFileStorage {
@@ -62,7 +63,7 @@ public class WebDAVFileStorage extends BaseFileStorage {
             throw new FileStorageRuntimeException(String.format("存储文件失败,%s", e.getMessage()), e);
         }
 
-        return new FileInfo(PathUtils.join(domain, basePath, fileWrapper.getPath(), fileName), fileName, basePath, fileWrapper);
+        return new FileInfo(UUID.randomUUID().toString(), PathUtils.join(domain, basePath, fileWrapper.getPath(), fileName), fileName, basePath, fileWrapper);
     }
 
     @Override
