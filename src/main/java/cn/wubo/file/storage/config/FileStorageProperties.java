@@ -3,6 +3,7 @@ package cn.wubo.file.storage.config;
 
 import cn.wubo.file.storage.platform.aliyunOSS.AliyunOSS;
 import cn.wubo.file.storage.platform.baiduBOS.BaiduBOS;
+import cn.wubo.file.storage.platform.git.Git;
 import cn.wubo.file.storage.platform.huaweiOBS.HuaweiOBS;
 import cn.wubo.file.storage.platform.local.Local;
 import cn.wubo.file.storage.platform.minIO.MinIO;
@@ -25,5 +26,6 @@ public class FileStorageProperties {
     private List<AliyunOSS> aliyunOSS = new ArrayList<>();
     private List<TencentCOS> tencentCOS = new ArrayList<>();
     private List<WebDAV> webDAV = new ArrayList<>();
+    private List<Git> git = new ArrayList<>();
 
 }

@@ -6,6 +6,7 @@ import cn.wubo.file.storage.platform.IFileStorage;
 import cn.wubo.file.storage.platform.aliyunOSS.AliyunOSSFileStorage;
 import cn.wubo.file.storage.platform.baiduBOS.BaiduBOSFileStorage;
 import cn.wubo.file.storage.platform.base.BasePlatform;
+import cn.wubo.file.storage.platform.git.GitFileStorage;
 import cn.wubo.file.storage.platform.huaweiOBS.HuaweiOBSFileStorage;
 import cn.wubo.file.storage.platform.local.LocalFileStorage;
 import cn.wubo.file.storage.platform.minIO.MinIOFileStorage;
@@ -28,7 +29,6 @@ public class FileStorageConfiguration {
 
     @Autowired
     private FileStorageProperties properties;
-
 
     /**
      * 本地存储
@@ -110,6 +110,18 @@ public class FileStorageConfiguration {
         return properties.getWebDAV().stream()
                 .filter(BasePlatform::getEnableStorage)
                 .map(WebDAVFileStorage::new)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Git 存储 Bean
+     */
+    @Bean
+    @ConditionalOnClass(name = "org.eclipse.jgit.api.Git")
+    public List<GitFileStorage> gitFileStorageList() {
+        return properties.getGit().stream()
+                .filter(BasePlatform::getEnableStorage)
+                .map(GitFileStorage::new)
                 .collect(Collectors.toList());
     }
 

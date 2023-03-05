@@ -63,6 +63,11 @@
                 <artifactId>sardine</artifactId>
                 <version>5.10</version>
             </dependency>
+            <dependency>
+                <groupId>org.eclipse.jgit</groupId>
+                <artifactId>org.eclipse.jgit</artifactId>
+                <version>6.4.0.202211300538-r</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -119,6 +124,12 @@
         <dependency>
             <groupId>com.github.lookfirst</groupId>
             <artifactId>sardine</artifactId>
+        </dependency>
+
+        <!-- Git -->
+        <dependency>
+            <groupId>org.eclipse.jgit</groupId>
+            <artifactId>org.eclipse.jgit</artifactId>
         </dependency>
     </dependencies>
 </project>

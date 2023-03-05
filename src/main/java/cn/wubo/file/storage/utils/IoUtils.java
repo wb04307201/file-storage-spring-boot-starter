@@ -54,11 +54,11 @@ public class IoUtils {
         }
     }
 
-    public static void close(Closeable closeable) {
-        if (closeable != null) {
+    public static void close(AutoCloseable autoCloseable) {
+        if (autoCloseable != null) {
             try {
-                closeable.close();
-            } catch (IOException e) {
+                autoCloseable.close();
+            } catch (Exception e) {
                 log.debug(e.getMessage(), e);
             }
         }
