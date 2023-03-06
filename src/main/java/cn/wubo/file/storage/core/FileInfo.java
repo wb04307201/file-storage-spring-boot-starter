@@ -19,11 +19,6 @@ public class FileInfo implements Serializable {
     private String id;
 
     /**
-     * 文件访问地址
-     */
-    private String url;
-
-    /**
      * 文件大小，单位字节
      */
     private Long size;
@@ -54,6 +49,11 @@ public class FileInfo implements Serializable {
     private String contentType;
 
     /**
+     * 平台
+     */
+    protected String platform;
+
+    /**
      * 别名
      */
     private String alias;
@@ -63,14 +63,14 @@ public class FileInfo implements Serializable {
      */
     private Date createTime;
 
-    public FileInfo(String url, String filename, String basePath, Date createTime, MultipartFileStorage fileWrapper) {
-        this.url = url;
+    public FileInfo(String filename, String basePath, Date createTime, MultipartFileStorage fileWrapper, String platform) {
         this.size = fileWrapper.getSize();
         this.filename = filename;
         this.originalFilename = fileWrapper.getOriginalFilename();
         this.basePath = basePath;
         this.path = fileWrapper.getPath();
         this.contentType = fileWrapper.getContentType();
+        this.platform = platform;
         this.alias = fileWrapper.getAlias();
         this.createTime = createTime;
     }

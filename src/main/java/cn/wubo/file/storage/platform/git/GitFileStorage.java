@@ -29,7 +29,7 @@ public class GitFileStorage extends BaseFileStorage {
     private org.eclipse.jgit.api.Git client;
 
     public GitFileStorage(Git prop) {
-        super(prop.getBasePath(), prop.getDomain(), prop.getAlias(), "Git");
+        super(prop.getBasePath(), prop.getAlias(), "Git");
         this.storagePath = prop.getStoragePath();
         this.repo = prop.getRepo();
         this.username = prop.getUsername();
@@ -78,7 +78,7 @@ public class GitFileStorage extends BaseFileStorage {
         } catch (GitAPIException e) {
             throw new FileStorageRuntimeException(String.format("存储文件失败,%s", e.getMessage()), e);
         }
-        return new FileInfo(domain + filePath, fileName, basePath, new Date(), fileWrapper);
+        return new FileInfo(fileName, basePath, new Date(), fileWrapper, platform);
     }
 
     @Override

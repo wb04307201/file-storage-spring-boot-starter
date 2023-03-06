@@ -4,7 +4,6 @@ import cn.wubo.file.storage.core.FileInfo;
 import cn.wubo.file.storage.platform.IFileStorage;
 import cn.wubo.file.storage.utils.PathUtils;
 
-import java.io.File;
 import java.nio.file.Paths;
 
 public abstract class BaseFileStorage implements IFileStorage {
@@ -13,11 +12,6 @@ public abstract class BaseFileStorage implements IFileStorage {
      * 基础路径
      */
     protected String basePath;
-
-    /**
-     * 访问域名
-     */
-    protected String domain;
 
     /**
      * 平台别名
@@ -29,9 +23,8 @@ public abstract class BaseFileStorage implements IFileStorage {
      */
     protected String platform;
 
-    protected BaseFileStorage(String basePath, String domain, String alias, String platform) {
+    protected BaseFileStorage(String basePath, String alias, String platform) {
         this.basePath = basePath;
-        this.domain = domain;
         this.alias = alias;
         this.platform = platform;
     }
@@ -54,8 +47,11 @@ public abstract class BaseFileStorage implements IFileStorage {
     }
 
 
-    @Override
-    public String getFilePath(FileInfo fileInfo) {
+    protected String getFilePath(FileInfo fileInfo) {
         return Paths.get(basePath, fileInfo.getPath(), fileInfo.getFilename()).toString();
+    }
+
+    protected String getUrlPath(FileInfo fileInfo) {
+        return PathUtils.join(basePath, fileInfo.getPath(), fileInfo.getFilename());
     }
 }

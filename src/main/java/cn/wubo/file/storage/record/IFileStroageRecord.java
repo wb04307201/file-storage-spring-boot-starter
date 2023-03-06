@@ -4,7 +4,7 @@ import cn.wubo.file.storage.core.FileInfo;
 
 import java.util.List;
 
-public interface IStroageRecord {
+public interface IFileStroageRecord {
 
     FileInfo save(FileInfo fileInfo);
 

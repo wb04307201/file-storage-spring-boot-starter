@@ -15,7 +15,16 @@ spring:
         path-patterns: /** # 访问路径
         storage-path: D:/Temp/ # 存储路径
         alias: local-1
-    huawei-obs: # 华为云 OBS ，不使用的情况下可以不写
+    minIO: # MinIO，由于 MinIO SDK 支持 AWS S3，其它兼容 AWS S3 协议的存储平台也都可配置在这里
+      - enable-storage: true  # 启用存储
+        access-key: ??
+        secret-key: ??
+        end-point: http://localhost:9090/
+        bucket-name: ??
+        domain: ?? # 访问域名，注意“/”结尾，例如：http://minio.abc.com/abc/
+        base-path: hy/ # 基础路径
+        alias: minio-1
+    huaweiOBS: # 华为云 OBS ，不使用的情况下可以不写
       - enable-storage: false  # 启用存储
         access-key: ??
         secret-key: ??
@@ -24,13 +33,10 @@ spring:
         domain: ?? # 访问域名，注意“/”结尾，例如：http://abc.obs.com/
         base-path: hy/ # 基础路径
         alias: huawei-obs-1
-    minio: # MinIO，由于 MinIO SDK 支持 AWS S3，其它兼容 AWS S3 协议的存储平台也都可配置在这里
-      - enable-storage: true  # 启用存储
-        access-key: ??
-        secret-key: ??
-        end-point: ??
-        bucket-name: ??
-        domain: ?? # 访问域名，注意“/”结尾，例如：http://minio.abc.com/abc/
-        base-path: hy/ # 基础路径
-        alias: minio-1
 ```
+
+docker安装minio 详细内容请查看 [Download](https://min.io/download#/docker) 或者 [MinIO Object Storage for Container](https://min.io/docs/minio/container/index.html)
+```bash
+docker run -p 9000:9000 -p 9090:9090 --name minio1 -v D:\minio\data:/data -e "MINIO_ROOT_USER=ROOTUSER" -e "MINIO_ROOT_PASSWORD=CHANGEME123" quay.io/minio/minio server /data --console-address ":9090"
+```
+用户名 ROOTUSER 密码 CHANGEME123

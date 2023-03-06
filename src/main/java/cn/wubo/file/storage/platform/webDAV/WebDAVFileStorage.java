@@ -25,7 +25,7 @@ public class WebDAVFileStorage extends BaseFileStorage {
     private Sardine client;
 
     public WebDAVFileStorage(WebDAV prop) {
-        super(prop.getBasePath(), prop.getDomain(), prop.getAlias(), "WebDAV");
+        super(prop.getBasePath(), prop.getAlias(), "WebDAV");
         this.server = prop.getServer();
         this.user = prop.getUser();
         this.password = prop.getPassword();
@@ -64,14 +64,14 @@ public class WebDAVFileStorage extends BaseFileStorage {
             throw new FileStorageRuntimeException(String.format("存储文件失败,%s", e.getMessage()), e);
         }
 
-        return new FileInfo(PathUtils.join(domain, basePath, fileWrapper.getPath(), fileName), fileName, basePath, new Date(), fileWrapper);
+        return new FileInfo(fileName, basePath, new Date(), fileWrapper, platform);
     }
 
     @Override
     public boolean delete(FileInfo fileInfo) {
         if (exists(fileInfo)) {
             try {
-                getClient().delete(PathUtils.join(server, storagePath, getFilePath(fileInfo)));
+                getClient().delete(PathUtils.join(server, storagePath, getUrlPath(fileInfo)));
             } catch (IOException e) {
                 throw new FileStorageRuntimeException(String.format("删除文件失败,%s", e.getMessage()), e);
             }
@@ -82,7 +82,7 @@ public class WebDAVFileStorage extends BaseFileStorage {
     @Override
     public boolean exists(FileInfo fileInfo) {
         try {
-            return getClient().exists(PathUtils.join(server, storagePath, getFilePath(fileInfo)));
+            return getClient().exists(PathUtils.join(server, storagePath, getUrlPath(fileInfo)));
         } catch (IOException e) {
             throw new FileStorageRuntimeException(String.format("查询文件是否存在失败,%s", e.getMessage()), e);
         }
@@ -90,7 +90,7 @@ public class WebDAVFileStorage extends BaseFileStorage {
 
     @Override
     public MultipartFileStorage download(FileInfo fileInfo) {
-        try (InputStream is = getClient().get(PathUtils.join(server, storagePath, getFilePath(fileInfo)))) {
+        try (InputStream is = getClient().get(PathUtils.join(server, storagePath, getUrlPath(fileInfo)))) {
             return new MultipartFileStorage(fileInfo.getFilename(), is);
         } catch (IOException e) {
             throw new FileStorageRuntimeException(String.format("下载文件失败,%s", e.getMessage()), e);

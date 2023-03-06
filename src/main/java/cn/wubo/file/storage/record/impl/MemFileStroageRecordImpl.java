@@ -1,7 +1,7 @@
 package cn.wubo.file.storage.record.impl;
 
 import cn.wubo.file.storage.core.FileInfo;
-import cn.wubo.file.storage.record.IStroageRecord;
+import cn.wubo.file.storage.record.IFileStroageRecord;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class MemStroageRecordImpl implements IStroageRecord {
+public class MemFileStroageRecordImpl implements IFileStroageRecord {
 
     private static List<FileInfo> fileInfos = new ArrayList<>();
 
@@ -29,7 +29,9 @@ public class MemStroageRecordImpl implements IStroageRecord {
     @Override
     public List<FileInfo> list(FileInfo fileInfo) {
         return fileInfos.stream()
-                .filter(e -> !StringUtils.hasLength(fileInfo.getAlias()) || fileInfo.getAlias().equals(e.getAlias()))
+                .filter(e -> !StringUtils.hasLength(fileInfo.getPlatform()) || fileInfo.getPlatform().equals(e.getPlatform()))
+                .filter(e -> !StringUtils.hasLength(fileInfo.getAlias()) || fileInfo.getAlias().contains(e.getAlias()))
+                .filter(e -> !StringUtils.hasLength(fileInfo.getOriginalFilename()) || fileInfo.getOriginalFilename().contains(e.getOriginalFilename()))
                 .collect(Collectors.toList());
     }
 

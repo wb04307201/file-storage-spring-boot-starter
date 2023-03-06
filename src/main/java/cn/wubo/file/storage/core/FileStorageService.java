@@ -2,8 +2,10 @@ package cn.wubo.file.storage.core;
 
 import cn.wubo.file.storage.exception.FileStorageRuntimeException;
 import cn.wubo.file.storage.platform.IFileStorage;
+import cn.wubo.file.storage.record.IFileStroageRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -13,8 +15,12 @@ public class FileStorageService implements DisposableBean {
 
     CopyOnWriteArrayList<IFileStorage> fileStorageList;
 
-    public FileStorageService(CopyOnWriteArrayList<IFileStorage> fileStorageList) {
+    IFileStroageRecord fileStroageRecord;
+
+
+    public FileStorageService(CopyOnWriteArrayList<IFileStorage> fileStorageList,IFileStroageRecord fileStroageRecord) {
         this.fileStorageList = fileStorageList;
+        this.fileStroageRecord = fileStroageRecord;
     }
 
     private IFileStorage getFileStorage(String alias) {

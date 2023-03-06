@@ -1,10 +1,11 @@
 package cn.wubo.file.storage.platform.tencentCOS;
 
-import cn.wubo.file.storage.utils.FileUtils;
 import cn.wubo.file.storage.core.FileInfo;
 import cn.wubo.file.storage.core.MultipartFileStorage;
 import cn.wubo.file.storage.exception.FileStorageRuntimeException;
 import cn.wubo.file.storage.platform.base.BaseFileStorage;
+import cn.wubo.file.storage.utils.FileUtils;
+import cn.wubo.file.storage.utils.PathUtils;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
@@ -17,7 +18,6 @@ import com.qcloud.cos.region.Region;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
-import java.util.UUID;
 
 public class TencentCOSFileStorage extends BaseFileStorage {
 
@@ -28,7 +28,7 @@ public class TencentCOSFileStorage extends BaseFileStorage {
     private COSClient client;
 
     public TencentCOSFileStorage(TencentCOS prop) {
-        super(prop.getBasePath(), prop.getDomain(), prop.getAlias(), "TencentCOS");
+        super(prop.getBasePath(), prop.getAlias(), "TencentCOS");
         this.secretId = prop.getSecretId();
         this.secretKey = prop.getSecretKey();
         this.region = prop.getRegion();
@@ -48,7 +48,7 @@ public class TencentCOSFileStorage extends BaseFileStorage {
     @Override
     public FileInfo save(MultipartFileStorage fileWrapper) {
         String fileName = FileUtils.getRandomFileName(fileWrapper.getOriginalFilename());
-        String filePath = basePath + fileWrapper.getPath() + fileName;
+        String filePath = PathUtils.join(basePath, fileWrapper.getPath(), fileName);
 
         try (InputStream is = fileWrapper.getInputStream()) {
             ObjectMetadata metadata = new ObjectMetadata();
@@ -60,23 +60,23 @@ public class TencentCOSFileStorage extends BaseFileStorage {
             throw new FileStorageRuntimeException(String.format("存储文件失败,%s", e.getMessage()), e);
         }
 
-        return new FileInfo(domain + filePath, fileName, basePath, new Date(), fileWrapper);
+        return new FileInfo(fileName, basePath, new Date(), fileWrapper, platform);
     }
 
     @Override
     public boolean delete(FileInfo fileInfo) {
-        if (exists(fileInfo)) getClient().deleteObject(bucketName, getFilePath(fileInfo));
+        if (exists(fileInfo)) getClient().deleteObject(bucketName, getUrlPath(fileInfo));
         return false;
     }
 
     @Override
     public boolean exists(FileInfo fileInfo) {
-        return getClient().doesObjectExist(bucketName, getFilePath(fileInfo));
+        return getClient().doesObjectExist(bucketName, getUrlPath(fileInfo));
     }
 
     @Override
     public MultipartFileStorage download(FileInfo fileInfo) {
-        COSObject object = getClient().getObject(bucketName, fileInfo.getBasePath() + fileInfo.getPath() + fileInfo.getFilename());
+        COSObject object = getClient().getObject(bucketName, getUrlPath(fileInfo));
         try (InputStream is = object.getObjectContent()) {
             return new MultipartFileStorage(fileInfo.getFilename(), is);
         } catch (IOException e) {

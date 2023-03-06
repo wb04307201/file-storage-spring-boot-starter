@@ -16,9 +16,5 @@ public class BasePlatform {
      * 基础路径
      */
     private String basePath = "";
-    /**
-     * 访问域名
-     */
-    private String domain = "";
 
 }

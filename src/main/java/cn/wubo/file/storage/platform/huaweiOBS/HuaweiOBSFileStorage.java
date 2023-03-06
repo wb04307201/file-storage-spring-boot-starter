@@ -1,11 +1,12 @@
 package cn.wubo.file.storage.platform.huaweiOBS;
 
-import cn.wubo.file.storage.utils.FileUtils;
-import cn.wubo.file.storage.utils.IoUtils;
 import cn.wubo.file.storage.core.FileInfo;
 import cn.wubo.file.storage.core.MultipartFileStorage;
 import cn.wubo.file.storage.exception.FileStorageRuntimeException;
 import cn.wubo.file.storage.platform.base.BaseFileStorage;
+import cn.wubo.file.storage.utils.FileUtils;
+import cn.wubo.file.storage.utils.IoUtils;
+import cn.wubo.file.storage.utils.PathUtils;
 import com.obs.services.ObsClient;
 import com.obs.services.model.ObjectMetadata;
 import com.obs.services.model.ObsObject;
@@ -14,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
-import java.util.UUID;
 
 @Slf4j
 public class HuaweiOBSFileStorage extends BaseFileStorage {
@@ -26,7 +26,7 @@ public class HuaweiOBSFileStorage extends BaseFileStorage {
     private ObsClient client;
 
     public HuaweiOBSFileStorage(HuaweiOBS prop) {
-        super(prop.getBasePath(), prop.getDomain(), prop.getAlias(), "HuaweiOBS");
+        super(prop.getBasePath(), prop.getAlias(), "HuaweiOBS");
         this.accessKey = prop.getAccessKey();
         this.secretKey = prop.getSecretKey();
         this.endPoint = prop.getEndPoint();
@@ -43,7 +43,7 @@ public class HuaweiOBSFileStorage extends BaseFileStorage {
     @Override
     public FileInfo save(MultipartFileStorage fileWrapper) {
         String fileName = FileUtils.getRandomFileName(fileWrapper.getOriginalFilename());
-        String filePath = basePath + fileWrapper.getPath() + fileName;
+        String filePath = PathUtils.join(basePath, fileWrapper.getPath(), fileName);
 
         try (InputStream is = fileWrapper.getInputStream()) {
             ObjectMetadata metadata = new ObjectMetadata();
@@ -59,23 +59,23 @@ public class HuaweiOBSFileStorage extends BaseFileStorage {
             throw new FileStorageRuntimeException(String.format("存储文件失败,%s", e.getMessage()), e);
         }
 
-        return new FileInfo(domain + filePath, fileName, basePath, new Date(), fileWrapper);
+        return new FileInfo(fileName, basePath, new Date(), fileWrapper, platform);
     }
 
     @Override
     public boolean delete(FileInfo fileInfo) {
-        if (exists(fileInfo)) getClient().deleteObject(bucketName, getFilePath(fileInfo));
+        if (exists(fileInfo)) getClient().deleteObject(bucketName, getUrlPath(fileInfo));
         return true;
     }
 
     @Override
     public boolean exists(FileInfo fileInfo) {
-        return getClient().doesObjectExist(bucketName, getFilePath(fileInfo));
+        return getClient().doesObjectExist(bucketName, getUrlPath(fileInfo));
     }
 
     @Override
     public MultipartFileStorage download(FileInfo fileInfo) {
-        ObsObject object = getClient().getObject(bucketName, getFilePath(fileInfo));
+        ObsObject object = getClient().getObject(bucketName, getUrlPath(fileInfo));
         try (InputStream is = object.getObjectContent()) {
             return new MultipartFileStorage(fileInfo.getFilename(), is);
         } catch (IOException e) {

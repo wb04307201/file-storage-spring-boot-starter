@@ -18,9 +18,9 @@ import java.util.List;
 @Data
 @ConfigurationProperties(prefix = "file.storage")
 public class FileStorageProperties {
-
+    private String fileStorageRecord = "cn.wubo.file.storage.record.impl.MemFileStroageRecordImpl";
     private List<Local> local = new ArrayList<>();
-    private List<MinIO> minIOS = new ArrayList<>();
+    private List<MinIO> minIO = new ArrayList<>();
     private List<HuaweiOBS> huaweiOBS = new ArrayList<>();
     private List<BaiduBOS> baiduBOS = new ArrayList<>();
     private List<AliyunOSS> aliyunOSS = new ArrayList<>();

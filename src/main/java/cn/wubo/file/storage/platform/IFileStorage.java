@@ -49,6 +49,4 @@ public interface IFileStorage {
      */
     void close();
 
-    String getFilePath(FileInfo fileInfo);
-
 }

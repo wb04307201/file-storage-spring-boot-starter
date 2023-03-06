@@ -2,6 +2,8 @@ package cn.wubo.file.storage.config;
 
 
 import cn.wubo.file.storage.core.FileStorageService;
+import cn.wubo.file.storage.exception.FileStorageRuntimeException;
+import cn.wubo.file.storage.page.FileStorageListServlet;
 import cn.wubo.file.storage.platform.IFileStorage;
 import cn.wubo.file.storage.platform.aliyunOSS.AliyunOSSFileStorage;
 import cn.wubo.file.storage.platform.baiduBOS.BaiduBOSFileStorage;
@@ -12,12 +14,15 @@ import cn.wubo.file.storage.platform.local.LocalFileStorage;
 import cn.wubo.file.storage.platform.minIO.MinIOFileStorage;
 import cn.wubo.file.storage.platform.tencentCOS.TencentCOSFileStorage;
 import cn.wubo.file.storage.platform.webDAV.WebDAVFileStorage;
+import cn.wubo.file.storage.record.IFileStroageRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.servlet.http.HttpServlet;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -27,8 +32,11 @@ import java.util.stream.Collectors;
 @EnableConfigurationProperties({FileStorageProperties.class})
 public class FileStorageConfiguration {
 
-    @Autowired
     private FileStorageProperties properties;
+
+    public FileStorageConfiguration(FileStorageProperties properties) {
+        this.properties = properties;
+    }
 
     /**
      * 本地存储
@@ -47,7 +55,7 @@ public class FileStorageConfiguration {
     @Bean
     @ConditionalOnClass(name = "io.minio.MinioClient")
     public List<MinIOFileStorage> minioFileStorageList() {
-        return properties.getMinIOS().stream()
+        return properties.getMinIO().stream()
                 .filter(BasePlatform::getEnableStorage)
                 .map(MinIOFileStorage::new)
                 .collect(Collectors.toList());
@@ -126,14 +134,35 @@ public class FileStorageConfiguration {
     }
 
     @Bean
-    public FileStorageService fileStorageService(List<List<? extends IFileStorage>> fileStorageLists) {
+    public IFileStroageRecord fileStorageRecord() {
+        try {
+            Class<?> clazz = Class.forName(properties.getFileStorageRecord());
+            IFileStroageRecord fileStorageRecord = (IFileStroageRecord) clazz.newInstance();
+            fileStorageRecord.init();
+            return fileStorageRecord;
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            throw new FileStorageRuntimeException(e.getMessage(), e);
+        }
+    }
+
+    @Bean
+    public FileStorageService fileStorageService(List<List<? extends IFileStorage>> fileStorageLists, IFileStroageRecord fileStroageRecord) {
         return new FileStorageService(
                 new CopyOnWriteArrayList<>(
                         fileStorageLists.stream()
                                 .flatMap(Collection::stream)
                                 .collect(Collectors.toList())
-                )
+                ),
+                fileStroageRecord
         );
+    }
+
+    @Bean
+    public ServletRegistrationBean<HttpServlet> listServlet(IFileStroageRecord fileStorageRecord) {
+        ServletRegistrationBean<HttpServlet> registration = new ServletRegistrationBean<>();
+        registration.setServlet(new FileStorageListServlet(fileStorageRecord));
+        registration.addUrlMappings("/file/storage/list");
+        return registration;
     }
 
 }

@@ -22,7 +22,7 @@ public class LocalFileStorage extends BaseFileStorage {
     private final String storagePath;
 
     public LocalFileStorage(Local prop) {
-        super(prop.getBasePath(), prop.getDomain(), prop.getAlias(), "Local");
+        super(prop.getBasePath(), prop.getAlias(), "Local");
         this.storagePath = prop.getStoragePath();
     }
 
@@ -31,7 +31,7 @@ public class LocalFileStorage extends BaseFileStorage {
         String fileName = FileUtils.getRandomFileName(fileWrapper.getOriginalFilename());
         String filePath = Paths.get(basePath, fileWrapper.getPath(), fileName).toString();
         fileWrapper.transferTo(Paths.get(this.storagePath, filePath).toFile());
-        return new FileInfo(domain + filePath, fileName, basePath, new Date(), fileWrapper);
+        return new FileInfo(fileName, basePath, new Date(), fileWrapper, platform);
     }
 
     @Override
