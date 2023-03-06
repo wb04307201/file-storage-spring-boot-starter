@@ -3,6 +3,8 @@ package cn.wubo.file.storage.config;
 
 import cn.wubo.file.storage.core.FileStorageService;
 import cn.wubo.file.storage.exception.FileStorageRuntimeException;
+import cn.wubo.file.storage.page.FileStorageDeleteServlet;
+import cn.wubo.file.storage.page.FileStorageDownloadServlet;
 import cn.wubo.file.storage.page.FileStorageListServlet;
 import cn.wubo.file.storage.platform.IFileStorage;
 import cn.wubo.file.storage.platform.aliyunOSS.AliyunOSSFileStorage;
@@ -162,6 +164,22 @@ public class FileStorageConfiguration {
         ServletRegistrationBean<HttpServlet> registration = new ServletRegistrationBean<>();
         registration.setServlet(new FileStorageListServlet(fileStorageRecord));
         registration.addUrlMappings("/file/storage/list");
+        return registration;
+    }
+
+    @Bean
+    public ServletRegistrationBean<HttpServlet> deleteServlet(FileStorageService fileStorageService) {
+        ServletRegistrationBean<HttpServlet> registration = new ServletRegistrationBean<>();
+        registration.setServlet(new FileStorageDeleteServlet(fileStorageService));
+        registration.addUrlMappings("/file/storage/delete");
+        return registration;
+    }
+
+    @Bean
+    public ServletRegistrationBean<HttpServlet> downloadServlet(FileStorageService fileStorageService) {
+        ServletRegistrationBean<HttpServlet> registration = new ServletRegistrationBean<>();
+        registration.setServlet(new FileStorageDownloadServlet(fileStorageService));
+        registration.addUrlMappings("/file/storage/download");
         return registration;
     }
 

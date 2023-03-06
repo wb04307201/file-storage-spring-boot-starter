@@ -61,6 +61,8 @@
                     <th scope="col">MIME</th>
                     <th scope="col">基础存储路径</th>
                     <th scope="col">存储路径</th>
+                    <th scope="col">删除</th>
+                    <th scope="col">下载</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -77,6 +79,8 @@
                             <td>${row.contentType!'-'}</td>
                             <td>${row.basePath!'-'}</td>
                             <td>${row.path!'-'}</td>
+                            <td><a href="${contextPath}/file/storage/delete?id=${row.id}" class="link-primary">@删除</a></td>
+                            <td><a href="${contextPath}/file/storage/download?id=${row.id}" class="link-primary">@下载</a></td>
                         </tr>
                     </#list>
                 </#if>

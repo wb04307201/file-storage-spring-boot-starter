@@ -45,9 +45,8 @@ public class MemFileStroageRecordImpl implements IFileStroageRecord {
     }
 
     @Override
-    public Boolean deleteById(String id) {
-        FileInfo old = findById(id);
-        return fileInfos.remove(old);
+    public Boolean delete(FileInfo fileInfo) {
+        return fileInfos.remove(fileInfo);
     }
 
     @Override

@@ -12,7 +12,7 @@ public interface IFileStroageRecord {
 
     FileInfo findById(String id);
 
-    Boolean deleteById(String id);
+    Boolean delete(FileInfo fileInfo);
 
     void init();
 }
