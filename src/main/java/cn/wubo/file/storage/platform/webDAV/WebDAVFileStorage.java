@@ -91,7 +91,7 @@ public class WebDAVFileStorage extends BaseFileStorage {
     @Override
     public MultipartFileStorage download(FileInfo fileInfo) {
         try (InputStream is = getClient().get(PathUtils.join(server, storagePath, getUrlPath(fileInfo)))) {
-            return new MultipartFileStorage(fileInfo.getFilename(), is);
+            return new MultipartFileStorage(fileInfo.getOriginalFilename(), is);
         } catch (IOException e) {
             throw new FileStorageRuntimeException(String.format("下载文件失败,%s", e.getMessage()), e);
         }

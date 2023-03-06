@@ -1,6 +1,7 @@
 package cn.wubo.file.storage.record.impl;
 
 import cn.wubo.file.storage.core.FileInfo;
+import cn.wubo.file.storage.exception.FileStorageRuntimeException;
 import cn.wubo.file.storage.record.IFileStroageRecord;
 import org.springframework.util.StringUtils;
 
@@ -41,7 +42,7 @@ public class MemFileStroageRecordImpl implements IFileStroageRecord {
                 .filter(e -> e.getId().equals(id))
                 .findAny();
         if (optionalFileInfo.isPresent()) return optionalFileInfo.get();
-        else throw new RuntimeException("not found!");
+        else throw new FileStorageRuntimeException("文件记录未找到!");
     }
 
     @Override

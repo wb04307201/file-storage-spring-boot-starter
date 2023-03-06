@@ -77,7 +77,7 @@ public class BaiduBOSFileStorage extends BaseFileStorage {
     public MultipartFileStorage download(FileInfo fileInfo) {
         BosObject object = getClient().getObject(bucketName, getUrlPath(fileInfo));
         try (InputStream is = object.getObjectContent()) {
-            return new MultipartFileStorage(fileInfo.getFilename(), is);
+            return new MultipartFileStorage(fileInfo.getOriginalFilename(), is);
         } catch (IOException e) {
             throw new FileStorageRuntimeException(String.format("下载文件失败,%s", e.getMessage()), e);
         }

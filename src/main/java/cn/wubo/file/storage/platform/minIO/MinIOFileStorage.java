@@ -103,7 +103,7 @@ public class MinIOFileStorage extends BaseFileStorage {
     @Override
     public MultipartFileStorage download(FileInfo fileInfo) {
         try (InputStream is = getClient().getObject(GetObjectArgs.builder().bucket(bucketName).object(getUrlPath(fileInfo)).build())) {
-            return new MultipartFileStorage(fileInfo.getFilename(), is);
+            return new MultipartFileStorage(fileInfo.getOriginalFilename(), is);
         } catch (ErrorResponseException | InsufficientDataException | InvalidKeyException | InternalException |
                  InvalidResponseException | XmlParserException | ServerException | NoSuchAlgorithmException |
                  IOException e) {

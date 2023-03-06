@@ -6,6 +6,7 @@ import cn.wubo.file.storage.exception.FileStorageRuntimeException;
 import cn.wubo.file.storage.platform.base.BaseFileStorage;
 import cn.wubo.file.storage.utils.FileUtils;
 import cn.wubo.file.storage.utils.IoUtils;
+import cn.wubo.file.storage.utils.PathUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
@@ -17,7 +18,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
-import java.util.UUID;
 
 @Slf4j
 public class GitFileStorage extends BaseFileStorage {
@@ -26,6 +26,7 @@ public class GitFileStorage extends BaseFileStorage {
     private String repo;
     private String username;
     private String password;
+    private String branch;
     private org.eclipse.jgit.api.Git client;
 
     public GitFileStorage(Git prop) {
@@ -34,6 +35,7 @@ public class GitFileStorage extends BaseFileStorage {
         this.repo = prop.getRepo();
         this.username = prop.getUsername();
         this.password = prop.getPassword();
+        this.branch = prop.getBranch();
     }
 
     private org.eclipse.jgit.api.Git getClient() {
@@ -41,10 +43,10 @@ public class GitFileStorage extends BaseFileStorage {
             Path path = Paths.get(storagePath);
             try {
                 if (Files.exists(path)) {
-                    Files.createDirectories(path);
-                    this.client = org.eclipse.jgit.api.Git.cloneRepository().setURI(repo).setDirectory(path.toFile()).call();
+                    this.client = org.eclipse.jgit.api.Git.open(path.toFile());
                 } else {
-                    this.client = org.eclipse.jgit.api.Git.wrap(new FileRepositoryBuilder().setGitDir(path.toFile()).build());
+                    Files.createDirectories(path);
+                    this.client = org.eclipse.jgit.api.Git.cloneRepository().setURI(repo).setDirectory(path.toFile()).setBranch(branch).setCredentialsProvider(provider()).call();
                 }
             } catch (GitAPIException | IOException e) {
                 throw new FileStorageRuntimeException(String.format("获取repo失败,%s", e.getMessage()), e);
@@ -55,7 +57,7 @@ public class GitFileStorage extends BaseFileStorage {
 
     private void pull() {
         try {
-            getClient().pull().call();
+            getClient().pull().setCredentialsProvider(provider()).call();
         } catch (GitAPIException e) {
             throw new FileStorageRuntimeException(String.format("从repo拉取变更失败,%s", e.getMessage()), e);
         }
@@ -70,9 +72,10 @@ public class GitFileStorage extends BaseFileStorage {
         pull();
         String fileName = FileUtils.getRandomFileName(fileWrapper.getOriginalFilename());
         String filePath = Paths.get(basePath, fileWrapper.getPath(), fileName).toString();
-        fileWrapper.transferTo(Paths.get(this.storagePath, filePath).toFile());
+        String urlPath = PathUtils.join(basePath, fileWrapper.getPath(), fileName);
+        fileWrapper.transferTo(Paths.get(storagePath, filePath).toFile());
         try {
-            getClient().add().addFilepattern(filePath).call();
+            getClient().add().addFilepattern(urlPath).call();
             getClient().commit().setMessage(String.format("提交文件%s", fileName)).call();
             getClient().push().setCredentialsProvider(provider()).call();
         } catch (GitAPIException e) {
@@ -85,7 +88,7 @@ public class GitFileStorage extends BaseFileStorage {
     public boolean delete(FileInfo fileInfo) {
         if (exists(fileInfo)) {
             try {
-                getClient().rm().addFilepattern(getFilePath(fileInfo)).call();
+                getClient().rm().addFilepattern(getUrlPath(fileInfo)).call();
                 getClient().commit().setMessage(String.format("删除文件%s", fileInfo.getFilename())).call();
                 getClient().push().setCredentialsProvider(provider()).call();
             } catch (GitAPIException e) {
@@ -104,7 +107,7 @@ public class GitFileStorage extends BaseFileStorage {
     @Override
     public MultipartFileStorage download(FileInfo fileInfo) {
         pull();
-        return new MultipartFileStorage(Paths.get(this.storagePath, getFilePath(fileInfo)).toFile());
+        return new MultipartFileStorage(fileInfo.getOriginalFilename(), IoUtils.readBytes(Paths.get(this.storagePath, getFilePath(fileInfo)).toFile()));
     }
 
     @Override

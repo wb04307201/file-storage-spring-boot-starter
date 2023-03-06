@@ -9,4 +9,5 @@ public class Git extends BasePlatform {
     private String repo;
     private String username;
     private String password;
+    private String branch;
 }

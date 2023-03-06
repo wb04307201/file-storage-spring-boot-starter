@@ -5,6 +5,7 @@ import cn.wubo.file.storage.core.FileInfo;
 import cn.wubo.file.storage.core.MultipartFileStorage;
 import cn.wubo.file.storage.exception.IORuntimeException;
 import cn.wubo.file.storage.platform.base.BaseFileStorage;
+import cn.wubo.file.storage.utils.IoUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -53,7 +54,7 @@ public class LocalFileStorage extends BaseFileStorage {
 
     @Override
     public MultipartFileStorage download(FileInfo fileInfo) {
-        return new MultipartFileStorage(Paths.get(this.storagePath, getFilePath(fileInfo)).toFile());
+        return new MultipartFileStorage(fileInfo.getOriginalFilename(), IoUtils.readBytes(Paths.get(this.storagePath, getFilePath(fileInfo)).toFile()));
     }
 
     @Override
