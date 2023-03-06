@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Date;
 import java.util.UUID;
 
 @Slf4j
@@ -77,7 +78,7 @@ public class GitFileStorage extends BaseFileStorage {
         } catch (GitAPIException e) {
             throw new FileStorageRuntimeException(String.format("存储文件失败,%s", e.getMessage()), e);
         }
-        return new FileInfo(UUID.randomUUID().toString(), domain + filePath, fileName, basePath, fileWrapper);
+        return new FileInfo(domain + filePath, fileName, basePath, new Date(), fileWrapper);
     }
 
     @Override

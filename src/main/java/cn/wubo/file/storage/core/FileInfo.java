@@ -63,7 +63,7 @@ public class FileInfo implements Serializable {
      */
     private Date createTime;
 
-    public FileInfo(String url, String filename,String basePath,MultipartFileStorage fileWrapper) {
+    public FileInfo(String url, String filename, String basePath, Date createTime, MultipartFileStorage fileWrapper) {
         this.url = url;
         this.size = fileWrapper.getSize();
         this.filename = filename;
@@ -72,20 +72,6 @@ public class FileInfo implements Serializable {
         this.path = fileWrapper.getPath();
         this.contentType = fileWrapper.getContentType();
         this.alias = fileWrapper.getAlias();
-        this.createTime = new Date();
-        this.id = UUID.randomUUID().toString();
-    }
-
-    public FileInfo(String id,String url, String filename,String basePath,MultipartFileStorage fileWrapper) {
-        this.url = url;
-        this.size = fileWrapper.getSize();
-        this.filename = filename;
-        this.originalFilename = fileWrapper.getOriginalFilename();
-        this.basePath = basePath;
-        this.path = fileWrapper.getPath();
-        this.contentType = fileWrapper.getContentType();
-        this.alias = fileWrapper.getAlias();
-        this.createTime = new Date();
-        this.id = id;
+        this.createTime = createTime;
     }
 }

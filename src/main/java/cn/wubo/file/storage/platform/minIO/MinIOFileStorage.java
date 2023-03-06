@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 import java.util.UUID;
 
 @Slf4j
@@ -60,7 +61,7 @@ public class MinIOFileStorage extends BaseFileStorage {
             throw new FileStorageRuntimeException(String.format("存储文件失败,%s", e.getMessage()), e);
         }
 
-        return new FileInfo(UUID.randomUUID().toString(), domain + filePath, fileName, basePath, fileWrapper);
+        return new FileInfo(domain + filePath, fileName, basePath, new Date(), fileWrapper);
     }
 
     @Override

@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -30,7 +31,7 @@ public class LocalFileStorage extends BaseFileStorage {
         String fileName = FileUtils.getRandomFileName(fileWrapper.getOriginalFilename());
         String filePath = Paths.get(basePath, fileWrapper.getPath(), fileName).toString();
         fileWrapper.transferTo(Paths.get(this.storagePath, filePath).toFile());
-        return new FileInfo(UUID.randomUUID().toString(), domain + filePath, fileName, basePath, fileWrapper);
+        return new FileInfo(domain + filePath, fileName, basePath, new Date(), fileWrapper);
     }
 
     @Override
