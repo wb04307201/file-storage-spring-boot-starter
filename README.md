@@ -1,8 +1,14 @@
 # file-storage-spring-boot-starter
 
 [Alist --一个支持多种存储的文件列表程序](https://alist.nn.ci)  
-[WebDAV 存储支持](https://alist.nn.ci/zh/guide/webdav.html#webdav-%E5%AD%98%E5%82%A8%E6%94%AF%E6%8C%81)  
 [sardine --an easy to use webdav client for java](https://github.com/lookfirst/sardine)
+
+```bash
+# docker安装
+docker run -d --restart=always -v /etc/alist:/opt/alist/data -p 5244:5244 -e PUID=0 -e PGID=0 -e UMASK=022 --name="alist" xhofe/alist:latest
+# 查看用户名和密码
+docker exec -it alist ./alist admin
+```
 
 ```yaml
 file:
@@ -20,13 +26,21 @@ file:
         bucket-name: testfilestorage
         base-path: temp/ # 基础路径
         alias: minio-1 # 别名
-    git: #Git
+    webDAV: #Git
       - enable-storage: true  #启用存储
         base-path: git/ # 基础路径
         storage-path: D:/Temp/ # 存储路径
-        repo: https://gitee.com/wb04307201/file-storage-test # Git仓库地址
-        username: wb04307201 # 用户名
+        server: https://gitee.com/wb04307201/file-storage-test # Git仓库地址
+        user: wb04307201 # 用户名
         password: 1986z11z20Z! # 密码
+        alias: git-1 # 别名
+    git: #Git
+      - enable-storage: true  #启用存储
+        base-path: git/ # 基础路径
+        storage-path: D:/GitTemp/ # 存储路径,会将仓库clone到这个目录
+        repo: ?? # Git仓库地址
+        username: ?? # 用户名
+        password: ?? # 密码
         alias: git-1 # 别名
 ```
 
