@@ -20,25 +20,25 @@ file:
         alias: local-1 # 别名
     minIO: # MinIO
       - enable-storage: true  # 启用存储
-        access-key: 24d96fQlwjqp1snT
-        secret-key: q01jDSLvAjeXW9vmMt4q1nHokJu2qecX
-        end-point: http://localhost:9000
-        bucket-name: testfilestorage
+        access-key: ??
+        secret-key: ??
+        end-point: ??
+        bucket-name: ??
         base-path: temp/ # 基础路径
         alias: minio-1 # 别名
     webDAV: #Git
       - enable-storage: true  #启用存储
-        base-path: git/ # 基础路径
-        storage-path: D:/Temp/ # 存储路径
-        server: https://gitee.com/wb04307201/file-storage-test # Git仓库地址
-        user: wb04307201 # 用户名
-        password: 1986z11z20Z! # 密码
-        alias: git-1 # 别名
+        base-path: temp/ # 基础路径
+        storage-path: /aliyun/ # 存储路径
+        server: http://127.0.0.1:5244 # Git仓库地址
+        user: admin # 用户名
+        password: q54U4YJb # 密码
+        alias: webDAV-1 # 别名
     git: #Git
       - enable-storage: true  #启用存储
         base-path: git/ # 基础路径
         storage-path: D:/GitTemp/ # 存储路径,会将仓库clone到这个目录
-        repo: ?? # Git仓库地址
+        repo: https://gitee.com/??/?? # Git仓库地址
         username: ?? # 用户名
         password: ?? # 密码
         alias: git-1 # 别名
