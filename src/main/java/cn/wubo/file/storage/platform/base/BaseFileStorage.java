@@ -2,7 +2,7 @@ package cn.wubo.file.storage.platform.base;
 
 import cn.wubo.file.storage.core.FileInfo;
 import cn.wubo.file.storage.platform.IFileStorage;
-import cn.wubo.file.storage.utils.PathUtils;
+import cn.wubo.file.storage.utils.UrlUtils;
 
 import java.nio.file.Paths;
 
@@ -52,6 +52,6 @@ public abstract class BaseFileStorage implements IFileStorage {
     }
 
     protected String getUrlPath(FileInfo fileInfo) {
-        return PathUtils.join(basePath, fileInfo.getPath(), fileInfo.getFilename());
+        return UrlUtils.join(basePath, fileInfo.getPath(), fileInfo.getFilename());
     }
 }

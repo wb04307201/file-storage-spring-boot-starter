@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 @Slf4j
 public class FileStorageDownloadServlet extends HttpServlet {
@@ -29,11 +31,9 @@ public class FileStorageDownloadServlet extends HttpServlet {
             MultipartFileStorage file = fileStorageService.download(id);
             resp.setContentType(file.getContentType());
             resp.addHeader("Content-Length", String.valueOf(file.getSize()));
-            resp.addHeader("Content-Disposition", "attachment;filename=" + file.getOriginalFilename());
+            resp.addHeader("Content-Disposition", "attachment;filename=" + new String(Objects.requireNonNull(file.getOriginalFilename()).getBytes(), StandardCharsets.ISO_8859_1));
             try (OutputStream os = resp.getOutputStream()) {
                 IoUtils.writeToStream(file.getBytes(), os);
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
             }
         } else {
             log.debug("contextPath========{}", contextPath);

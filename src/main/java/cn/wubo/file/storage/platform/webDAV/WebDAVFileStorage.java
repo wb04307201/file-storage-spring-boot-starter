@@ -5,7 +5,7 @@ import cn.wubo.file.storage.utils.FileUtils;
 import cn.wubo.file.storage.core.FileInfo;
 import cn.wubo.file.storage.core.MultipartFileStorage;
 import cn.wubo.file.storage.platform.base.BaseFileStorage;
-import cn.wubo.file.storage.utils.PathUtils;
+import cn.wubo.file.storage.utils.UrlUtils;
 import com.github.sardine.Sardine;
 import com.github.sardine.SardineFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
-import java.util.UUID;
 
 @Slf4j
 public class WebDAVFileStorage extends BaseFileStorage {
@@ -41,7 +40,7 @@ public class WebDAVFileStorage extends BaseFileStorage {
 
     public void createDirectory(String path) throws IOException {
         if (!getClient().exists(path)) {
-            createDirectory(PathUtils.join(PathUtils.getParent(path), "/"));
+            createDirectory(UrlUtils.join(UrlUtils.getParent(path), "/"));
             getClient().createDirectory(path);
         }
     }
@@ -49,8 +48,8 @@ public class WebDAVFileStorage extends BaseFileStorage {
     @Override
     public FileInfo save(MultipartFileStorage fileWrapper) {
         String fileName = FileUtils.getRandomFileName(fileWrapper.getOriginalFilename());
-        String fileDir = PathUtils.join(server, storagePath, basePath, fileWrapper.getPath());
-        String filePath = PathUtils.join(server, storagePath, basePath, fileWrapper.getPath(), fileName);
+        String fileDir = UrlUtils.join(server, storagePath, basePath, fileWrapper.getPath());
+        String filePath = UrlUtils.join(server, storagePath, basePath, fileWrapper.getPath(), fileName);
 
         try {
             createDirectory(fileDir);
@@ -71,7 +70,7 @@ public class WebDAVFileStorage extends BaseFileStorage {
     public boolean delete(FileInfo fileInfo) {
         if (exists(fileInfo)) {
             try {
-                getClient().delete(PathUtils.join(server, storagePath, getUrlPath(fileInfo)));
+                getClient().delete(UrlUtils.join(server, storagePath, getUrlPath(fileInfo)));
             } catch (IOException e) {
                 throw new FileStorageRuntimeException(String.format("删除文件失败,%s", e.getMessage()), e);
             }
@@ -82,7 +81,7 @@ public class WebDAVFileStorage extends BaseFileStorage {
     @Override
     public boolean exists(FileInfo fileInfo) {
         try {
-            return getClient().exists(PathUtils.join(server, storagePath, getUrlPath(fileInfo)));
+            return getClient().exists(UrlUtils.join(server, storagePath, getUrlPath(fileInfo)));
         } catch (IOException e) {
             throw new FileStorageRuntimeException(String.format("查询文件是否存在失败,%s", e.getMessage()), e);
         }
@@ -90,7 +89,7 @@ public class WebDAVFileStorage extends BaseFileStorage {
 
     @Override
     public MultipartFileStorage download(FileInfo fileInfo) {
-        try (InputStream is = getClient().get(PathUtils.join(server, storagePath, getUrlPath(fileInfo)))) {
+        try (InputStream is = getClient().get(UrlUtils.join(server, storagePath, getUrlPath(fileInfo)))) {
             return new MultipartFileStorage(fileInfo.getOriginalFilename(), is);
         } catch (IOException e) {
             throw new FileStorageRuntimeException(String.format("下载文件失败,%s", e.getMessage()), e);

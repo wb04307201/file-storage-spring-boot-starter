@@ -6,7 +6,7 @@ import cn.wubo.file.storage.exception.FileStorageRuntimeException;
 import cn.wubo.file.storage.platform.base.BaseFileStorage;
 import cn.wubo.file.storage.utils.FileUtils;
 import cn.wubo.file.storage.utils.IoUtils;
-import cn.wubo.file.storage.utils.PathUtils;
+import cn.wubo.file.storage.utils.UrlUtils;
 import com.obs.services.ObsClient;
 import com.obs.services.model.ObjectMetadata;
 import com.obs.services.model.ObsObject;
@@ -43,7 +43,7 @@ public class HuaweiOBSFileStorage extends BaseFileStorage {
     @Override
     public FileInfo save(MultipartFileStorage fileWrapper) {
         String fileName = FileUtils.getRandomFileName(fileWrapper.getOriginalFilename());
-        String filePath = PathUtils.join(basePath, fileWrapper.getPath(), fileName);
+        String filePath = UrlUtils.join(basePath, fileWrapper.getPath(), fileName);
 
         try (InputStream is = fileWrapper.getInputStream()) {
             ObjectMetadata metadata = new ObjectMetadata();

@@ -2,7 +2,7 @@ package cn.wubo.file.storage.utils;
 
 import java.util.Arrays;
 
-public class PathUtils {
+public class UrlUtils {
 
 
     /**

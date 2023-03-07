@@ -5,7 +5,7 @@ import cn.wubo.file.storage.core.MultipartFileStorage;
 import cn.wubo.file.storage.exception.FileStorageRuntimeException;
 import cn.wubo.file.storage.platform.base.BaseFileStorage;
 import cn.wubo.file.storage.utils.FileUtils;
-import cn.wubo.file.storage.utils.PathUtils;
+import cn.wubo.file.storage.utils.UrlUtils;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.OSSObject;
@@ -41,7 +41,7 @@ public class AliyunOSSFileStorage extends BaseFileStorage {
     @Override
     public FileInfo save(MultipartFileStorage fileWrapper) {
         String fileName = FileUtils.getRandomFileName(fileWrapper.getOriginalFilename());
-        String filePath = PathUtils.join(basePath, fileWrapper.getPath(), fileName);
+        String filePath = UrlUtils.join(basePath, fileWrapper.getPath(), fileName);
 
         try (InputStream is = fileWrapper.getInputStream()) {
             ObjectMetadata metadata = new ObjectMetadata();

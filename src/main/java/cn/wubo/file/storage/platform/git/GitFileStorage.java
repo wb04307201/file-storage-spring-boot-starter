@@ -6,10 +6,9 @@ import cn.wubo.file.storage.exception.FileStorageRuntimeException;
 import cn.wubo.file.storage.platform.base.BaseFileStorage;
 import cn.wubo.file.storage.utils.FileUtils;
 import cn.wubo.file.storage.utils.IoUtils;
-import cn.wubo.file.storage.utils.PathUtils;
+import cn.wubo.file.storage.utils.UrlUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
@@ -72,7 +71,7 @@ public class GitFileStorage extends BaseFileStorage {
         pull();
         String fileName = FileUtils.getRandomFileName(fileWrapper.getOriginalFilename());
         String filePath = Paths.get(basePath, fileWrapper.getPath(), fileName).toString();
-        String urlPath = PathUtils.join(basePath, fileWrapper.getPath(), fileName);
+        String urlPath = UrlUtils.join(basePath, fileWrapper.getPath(), fileName);
         fileWrapper.transferTo(Paths.get(storagePath, filePath).toFile());
         try {
             getClient().add().addFilepattern(urlPath).call();

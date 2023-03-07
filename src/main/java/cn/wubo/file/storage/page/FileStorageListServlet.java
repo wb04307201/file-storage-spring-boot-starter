@@ -49,7 +49,7 @@ public class FileStorageListServlet extends HttpServlet {
             try {
                 Template template = cfg.getTemplate("list.ftl", "UTF-8");
                 template.process(data, resp.getWriter());
-            } catch (TemplateException | IOException e) {
+            } catch (TemplateException e) {
                 throw new FileStorageRuntimeException(e.getMessage(), e);
             }
         } else {
