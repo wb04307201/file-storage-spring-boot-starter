@@ -159,7 +159,7 @@ public class FileStorageConfiguration {
     }
 
     @Bean
-    public ServletRegistrationBean<HttpServlet> listServlet(IFileStroageRecord fileStorageRecord) {
+    public ServletRegistrationBean<HttpServlet> fileStorageListServlet(IFileStroageRecord fileStorageRecord) {
         ServletRegistrationBean<HttpServlet> registration = new ServletRegistrationBean<>();
         registration.setServlet(new FileStorageListServlet(fileStorageRecord));
         registration.addUrlMappings("/file/storage/list");
@@ -167,7 +167,7 @@ public class FileStorageConfiguration {
     }
 
     @Bean
-    public ServletRegistrationBean<HttpServlet> deleteServlet(FileStorageService fileStorageService) {
+    public ServletRegistrationBean<HttpServlet> fileStorageDeleteServlet(FileStorageService fileStorageService) {
         ServletRegistrationBean<HttpServlet> registration = new ServletRegistrationBean<>();
         registration.setServlet(new FileStorageDeleteServlet(fileStorageService));
         registration.addUrlMappings("/file/storage/delete");
@@ -175,7 +175,7 @@ public class FileStorageConfiguration {
     }
 
     @Bean
-    public ServletRegistrationBean<HttpServlet> downloadServlet(FileStorageService fileStorageService) {
+    public ServletRegistrationBean<HttpServlet> fileStorageDownloadServlet(FileStorageService fileStorageService) {
         ServletRegistrationBean<HttpServlet> registration = new ServletRegistrationBean<>();
         registration.setServlet(new FileStorageDownloadServlet(fileStorageService));
         registration.addUrlMappings("/file/storage/download");
