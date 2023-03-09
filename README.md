@@ -2,9 +2,9 @@
 
 [![](https://jitpack.io/v/com.gitee.wb04307201/file-storage-spring-boot-starter.svg)](https://jitpack.io/#com.gitee.wb04307201/file-storage-spring-boot-starter)
 
-> 一个适配多平台文件存储的工具包
-> 可通过简单的配置既可集成到springboot中
-> 将文件存储到本地、MinIO、华为云OBS、百度云 BOS、阿里云OSS、腾讯云COS、WebDAV、Git等平台
+> 一个适配多平台文件存储的工具包  
+> 可通过简单的配置既可集成到springboot中  
+> 将文件存储到本地、MinIO、华为云OBS、百度云 BOS、阿里云OSS、腾讯云COS、WebDAV、Git等平台  
 
 ## [代码示例](https://gitee.com/wb04307201/file-storage-demo)
 
