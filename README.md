@@ -57,7 +57,7 @@ file:
         base-path: local/ # 基础路径
         storage-path: D:/Temp/ # 存储路径
         alias: local-1 # 别名
-    minIO: # MinIO
+    minIO: # MinIO 以及其他兼容AWS S3标准网盘
       - enable-storage: true  # 启用存储
         access-key: ??
         secret-key: ??
