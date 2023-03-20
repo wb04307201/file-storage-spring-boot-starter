@@ -47,7 +47,7 @@ public class FileStorageListServlet extends HttpServlet {
             cfg.setClassForTemplateLoading(this.getClass(), "/template");
             resp.setCharacterEncoding("UTF-8");
             try {
-                Template template = cfg.getTemplate("list.ftl", "UTF-8");
+                Template template = cfg.getTemplate("storagelist.ftl", "UTF-8");
                 template.process(data, resp.getWriter());
             } catch (TemplateException e) {
                 throw new FileStorageRuntimeException(e.getMessage(), e);
