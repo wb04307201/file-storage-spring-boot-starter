@@ -265,6 +265,8 @@ public class FileUtils {
                 contentType = "application/vnd.android.package-archive";
             } else if (StringUtils.endsWithIgnoreCase(filePath, ".bin") || StringUtils.endsWithIgnoreCase(filePath, ".class") || StringUtils.endsWithIgnoreCase(filePath, ".exe")) {
                 contentType = "application/octet-stream";
+            } else if (StringUtils.endsWithIgnoreCase(filePath, ".xmind")) {
+                contentType = "application/xmind";
             }
         }
 
