@@ -29,8 +29,8 @@ public class FileStorageDownloadServlet extends HttpServlet {
         if (fileStorageService != null) {
             String id = req.getParameter("id");
             MultipartFileStorage file = fileStorageService.download(id);
-//            resp.setContentType(file.getContentType());
-            resp.setContentType("application/octet-stream");
+            resp.setContentType(file.getContentType());
+            //resp.setContentType("application/octet-stream");
             resp.addHeader("Content-Length", String.valueOf(file.getSize()));
             resp.addHeader("Content-Disposition", "attachment;filename=" + new String(Objects.requireNonNull(file.getOriginalFilename()).getBytes(), StandardCharsets.ISO_8859_1));
             try (OutputStream os = resp.getOutputStream()) {
