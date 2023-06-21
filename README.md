@@ -335,3 +335,7 @@ docker run -d --restart=always -v /etc/alist:/opt/alist/data -p 5244:5244 -e PUI
 # 查看用户名和密码
 docker exec -it alist ./alist admin
 ```
+
+## 未来可能的工作？
+
+- [ ] *扩展对FTP的支持*
