@@ -22,8 +22,6 @@
 
 ## 第二步 引入jar
 
-版本请到[jitpack](https://jitpack.io/#com.gitee.wb04307201/chatbot-spring-boot-starter)查看
-
 ```xml
 
 <dependency>
@@ -32,6 +30,7 @@
     <version>版本</version>
 </dependency>
 ```
+版本请从[jitpack](https://jitpack.io/#com.gitee.wb04307201/file-storage-spring-boot-starter)或者当前仓库发行版获取
 
 ## 第三步 在启动类上加上`@EnableFileStorage`注解
 
