@@ -3,6 +3,7 @@ package cn.wubo.file.storage.record.impl;
 import cn.wubo.file.storage.core.FileInfo;
 import cn.wubo.file.storage.exception.FileStorageRuntimeException;
 import cn.wubo.file.storage.record.IFileStroageRecord;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Component
 public class MemFileStroageRecordImpl implements IFileStroageRecord {
 
     private static List<FileInfo> fileInfos = new ArrayList<>();

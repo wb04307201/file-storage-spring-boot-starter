@@ -44,10 +44,7 @@ public class FileStorageConfiguration {
      */
     @Bean
     public List<LocalFileStorage> localFileStorageList() {
-        return properties.getLocal().stream()
-                .filter(BasePlatform::getEnableStorage)
-                .map(LocalFileStorage::new)
-                .collect(Collectors.toList());
+        return properties.getLocal().stream().filter(BasePlatform::getEnableStorage).map(LocalFileStorage::new).collect(Collectors.toList());
     }
 
     /**
@@ -56,10 +53,7 @@ public class FileStorageConfiguration {
     @Bean
     @ConditionalOnClass(name = "io.minio.MinioClient")
     public List<MinIOFileStorage> minioFileStorageList() {
-        return properties.getMinIO().stream()
-                .filter(BasePlatform::getEnableStorage)
-                .map(MinIOFileStorage::new)
-                .collect(Collectors.toList());
+        return properties.getMinIO().stream().filter(BasePlatform::getEnableStorage).map(MinIOFileStorage::new).collect(Collectors.toList());
     }
 
     /**
@@ -68,10 +62,7 @@ public class FileStorageConfiguration {
     @Bean
     @ConditionalOnClass(name = "com.obs.services.ObsClient")
     public List<HuaweiOBSFileStorage> huaweiObsFileStorageList() {
-        return properties.getHuaweiOBS().stream()
-                .filter(BasePlatform::getEnableStorage)
-                .map(HuaweiOBSFileStorage::new)
-                .collect(Collectors.toList());
+        return properties.getHuaweiOBS().stream().filter(BasePlatform::getEnableStorage).map(HuaweiOBSFileStorage::new).collect(Collectors.toList());
     }
 
     /**
@@ -80,10 +71,7 @@ public class FileStorageConfiguration {
     @Bean
     @ConditionalOnClass(name = "com.baidubce.services.bos.BosClient")
     public List<BaiduBOSFileStorage> baiduBosFileStorageList() {
-        return properties.getBaiduBOS().stream()
-                .filter(BasePlatform::getEnableStorage)
-                .map(BaiduBOSFileStorage::new)
-                .collect(Collectors.toList());
+        return properties.getBaiduBOS().stream().filter(BasePlatform::getEnableStorage).map(BaiduBOSFileStorage::new).collect(Collectors.toList());
     }
 
     /**
@@ -92,10 +80,7 @@ public class FileStorageConfiguration {
     @Bean
     @ConditionalOnClass(name = "com.aliyun.oss.OSS")
     public List<AliyunOSSFileStorage> aliyunOssFileStorageList() {
-        return properties.getAliyunOSS().stream()
-                .filter(BasePlatform::getEnableStorage)
-                .map(AliyunOSSFileStorage::new)
-                .collect(Collectors.toList());
+        return properties.getAliyunOSS().stream().filter(BasePlatform::getEnableStorage).map(AliyunOSSFileStorage::new).collect(Collectors.toList());
     }
 
     /**
@@ -104,10 +89,7 @@ public class FileStorageConfiguration {
     @Bean
     @ConditionalOnClass(name = "com.qcloud.cos.COSClient")
     public List<TencentCOSFileStorage> tencentCosFileStorageList() {
-        return properties.getTencentCOS().stream()
-                .filter(BasePlatform::getEnableStorage)
-                .map(TencentCOSFileStorage::new)
-                .collect(Collectors.toList());
+        return properties.getTencentCOS().stream().filter(BasePlatform::getEnableStorage).map(TencentCOSFileStorage::new).collect(Collectors.toList());
     }
 
     /**
@@ -116,10 +98,7 @@ public class FileStorageConfiguration {
     @Bean
     @ConditionalOnClass(name = "com.github.sardine.Sardine")
     public List<WebDAVFileStorage> webDavFileStorageList() {
-        return properties.getWebDAV().stream()
-                .filter(BasePlatform::getEnableStorage)
-                .map(WebDAVFileStorage::new)
-                .collect(Collectors.toList());
+        return properties.getWebDAV().stream().filter(BasePlatform::getEnableStorage).map(WebDAVFileStorage::new).collect(Collectors.toList());
     }
 
     /**
@@ -128,40 +107,18 @@ public class FileStorageConfiguration {
     @Bean
     @ConditionalOnClass(name = "org.eclipse.jgit.api.Git")
     public List<GitFileStorage> gitFileStorageList() {
-        return properties.getGit().stream()
-                .filter(BasePlatform::getEnableStorage)
-                .map(GitFileStorage::new)
-                .collect(Collectors.toList());
+        return properties.getGit().stream().filter(BasePlatform::getEnableStorage).map(GitFileStorage::new).collect(Collectors.toList());
     }
 
     @Bean
-    public IFileStroageRecord fileStorageRecord() {
-        try {
-            Class<?> clazz = Class.forName(properties.getFileStorageRecord());
-            IFileStroageRecord fileStorageRecord = (IFileStroageRecord) clazz.newInstance();
-            fileStorageRecord.init();
-            return fileStorageRecord;
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-            throw new FileStorageRuntimeException(e.getMessage(), e);
-        }
+    public FileStorageService fileStorageService(List<List<? extends IFileStorage>> fileStorageLists, List<IFileStroageRecord> fileStroageRecordList) {
+        return new FileStorageService(new CopyOnWriteArrayList<>(fileStorageLists.stream().flatMap(Collection::stream).collect(Collectors.toList())), fileStroageRecordList.stream().filter(obj -> obj.getClass().getName().equals(properties.getFileStorageRecord())).findAny().orElseThrow(() -> new FileStorageRuntimeException("!!!")));
     }
 
     @Bean
-    public FileStorageService fileStorageService(List<List<? extends IFileStorage>> fileStorageLists, IFileStroageRecord fileStroageRecord) {
-        return new FileStorageService(
-                new CopyOnWriteArrayList<>(
-                        fileStorageLists.stream()
-                                .flatMap(Collection::stream)
-                                .collect(Collectors.toList())
-                ),
-                fileStroageRecord
-        );
-    }
-
-    @Bean
-    public ServletRegistrationBean<HttpServlet> fileStorageListServlet(IFileStroageRecord fileStorageRecord) {
+    public ServletRegistrationBean<HttpServlet> fileStorageListServlet(List<IFileStroageRecord> fileStroageRecordList) {
         ServletRegistrationBean<HttpServlet> registration = new ServletRegistrationBean<>();
-        registration.setServlet(new FileStorageListServlet(fileStorageRecord));
+        registration.setServlet(new FileStorageListServlet(fileStroageRecordList.stream().filter(obj -> obj.getClass().getName().equals(properties.getFileStorageRecord())).findAny().orElseThrow(() -> new FileStorageRuntimeException("!!!"))));
         registration.addUrlMappings("/file/storage/list");
         return registration;
     }

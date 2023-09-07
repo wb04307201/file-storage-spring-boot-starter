@@ -2,7 +2,7 @@
 
 [![](https://jitpack.io/v/com.gitee.wb04307201/file-storage-spring-boot-starter.svg)](https://jitpack.io/#com.gitee.wb04307201/file-storage-spring-boot-starter)
 
-> 一个适配多平台对象存储的中间件  
+> 一个适配多平台文件存储的中间件  
 > 可通过简单的配置既可集成到springboot中  
 > 将文件存储到本地、MinIO、华为云OBS、百度云 BOS、阿里云OSS、腾讯云COS、WebDAV、Git等平台  
 
@@ -216,9 +216,11 @@ public class PageController {
 注意：如配置了context-path需要在地址中对应添加  
 ![img.png](img.png)
 
-## 其他2：实际使用中，可通过配置和实现接口方法将数据持久化到数据库中
+## 其他2：实际使用中，可通过配置和实现文件存储记录接口方法将数据持久化到数据库中
 继承IFileStroageRecord并实现方法，例如
+
 ```java
+@Component
 public class H2FileStroageRecordImpl implements IFileStroageRecord {
 
     private static final String HISTORY = "file_storage_history";
