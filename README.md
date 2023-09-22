@@ -334,6 +334,9 @@ docker run -d --restart=always -v /etc/alist:/opt/alist/data -p 5244:5244 -e PUI
 docker exec -it alist ./alist admin
 ```
 
-## 未来可能的工作？
+## 待办
 
 - [ ] *扩展对FTP的支持*
+
+- [ ] *使用git存储，初始化时仓库clone到本地*
+
