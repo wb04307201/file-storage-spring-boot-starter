@@ -25,7 +25,7 @@
 <dependency>
     <groupId>com.gitee.wb04307201</groupId>
     <artifactId>file-storage-spring-boot-starter</artifactId>
-    <version>1.0.7</version>
+    <version>1.0.8</version>
 </dependency>
 ```
 
