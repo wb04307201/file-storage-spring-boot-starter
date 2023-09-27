@@ -338,5 +338,3 @@ docker exec -it alist ./alist admin
 
 - [ ] *扩展对FTP的支持*
 
-- [ ] *使用git存储，初始化时仓库clone到本地*
-
