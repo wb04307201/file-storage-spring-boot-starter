@@ -8,8 +8,9 @@ import lombok.Data;
  */
 @Data
 public class AmazonS3 extends BasePlatform {
-    private String accessKey;
-    private String secretKey;
+    private String accessKeyId;
+    private String secretAccessKey;
+    private String region;
     private String endPoint;
     private String bucketName;
 }

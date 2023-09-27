@@ -2,41 +2,45 @@ package cn.wubo.file.storage.platform.amazonS3;
 
 import cn.wubo.file.storage.core.FileInfo;
 import cn.wubo.file.storage.core.MultipartFileStorage;
-import cn.wubo.file.storage.exception.FileStorageRuntimeException;
 import cn.wubo.file.storage.platform.base.BaseFileStorage;
-import cn.wubo.file.storage.platform.minIO.MinIO;
 import cn.wubo.file.storage.utils.FileUtils;
 import cn.wubo.file.storage.utils.UrlUtils;
-import io.minio.*;
-import io.minio.errors.*;
 import lombok.extern.slf4j.Slf4j;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.core.ResponseInputStream;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3Configuration;
+import software.amazon.awssdk.services.s3.model.*;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
 @Slf4j
 public class AmazonS3FileStorage extends BaseFileStorage {
 
-    private final String accessKey;
-    private final String secretKey;
+    private final String accessKeyId;
+    private final String secretAccessKey;
+    private final Region region;
     private final String endPoint;
     private final String bucketName;
-    private MinioClient client;
+    private S3Client client;
 
-    public AmazonS3FileStorage(MinIO prop) {
+    public AmazonS3FileStorage(AmazonS3 prop) {
         super(prop.getBasePath(), prop.getAlias(), "AmazonS3");
-        this.accessKey = prop.getAccessKey();
-        this.secretKey = prop.getSecretKey();
+        this.accessKeyId = prop.getAccessKeyId();
+        this.secretAccessKey = prop.getSecretAccessKey();
+        this.region = Region.of(prop.getRegion());
         this.endPoint = prop.getEndPoint();
         this.bucketName = prop.getBucketName();
     }
 
-    private MinioClient getClient() {
+    private S3Client getClient() {
         if (client == null) {
-            client = new MinioClient.Builder().credentials(accessKey, secretKey).endpoint(endPoint).build();
+            AwsBasicCredentials awsBasicCredentials = AwsBasicCredentials.create(accessKeyId, secretAccessKey);
+            S3Configuration s3Config = S3Configuration.builder().pathStyleAccessEnabled(true).build();
+            client = S3Client.builder().credentialsProvider(StaticCredentialsProvider.create(awsBasicCredentials)).region(region).serviceConfiguration(s3Config).build();
         }
         return client;
     }
@@ -46,74 +50,37 @@ public class AmazonS3FileStorage extends BaseFileStorage {
     public FileInfo save(MultipartFileStorage fileWrapper) {
         String fileName = FileUtils.getRandomFileName(fileWrapper.getOriginalFilename());
         String filePath = UrlUtils.join(basePath, fileWrapper.getPath(), fileName);
-
-        try (InputStream is = fileWrapper.getInputStream()) {
-            getClient().putObject(PutObjectArgs.builder().bucket(bucketName).object(filePath)
-                    .stream(is, fileWrapper.getSize(), -1)
-                    .contentType(fileWrapper.getContentType()).build());
-        } catch (IOException | ErrorResponseException | InsufficientDataException | InternalException |
-                 InvalidKeyException | InvalidResponseException | NoSuchAlgorithmException | ServerException |
-                 XmlParserException e) {
-            try {
-                getClient().removeObject(RemoveObjectArgs.builder().bucket(bucketName).object(filePath).build());
-            } catch (Exception ex) {
-                log.error(ex.getMessage(), ex);
-            }
-            throw new FileStorageRuntimeException(String.format("存储文件失败,%s", e.getMessage()), e);
-        }
-
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder().bucket(bucketName).key(filePath).contentType(fileWrapper.getContentType()).build();
+        RequestBody requestBody = RequestBody.fromBytes(fileWrapper.getBytes());
+        getClient().putObject(putObjectRequest, requestBody);
         return new FileInfo(fileName, basePath, new Date(), fileWrapper, platform);
     }
 
     @Override
     public boolean delete(FileInfo fileInfo) {
         if (exists(fileInfo)) {
-            try {
-                getClient().removeObject(
-                        RemoveObjectArgs.builder()
-                                .bucket(bucketName).
-                                object(getUrlPath(fileInfo))
-                                .build()
-                );
-            } catch (ErrorResponseException | InsufficientDataException | InvalidKeyException | InternalException |
-                     InvalidResponseException | XmlParserException | ServerException | NoSuchAlgorithmException |
-                     IOException e) {
-                throw new FileStorageRuntimeException(String.format("删除文件失败,%s", e.getMessage()), e);
-            }
+            DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder().bucket(bucketName).key(getUrlPath(fileInfo)).build();
+            getClient().deleteObject(deleteObjectRequest);
         }
         return true;
     }
 
     @Override
     public boolean exists(FileInfo fileInfo) {
-        try {
-            StatObjectResponse stat = getClient().statObject(
-                    StatObjectArgs.builder()
-                            .bucket(bucketName).
-                            object(getUrlPath(fileInfo))
-                            .build()
-            );
-            return stat != null && stat.lastModified() != null;
-        } catch (ErrorResponseException | InsufficientDataException | InvalidKeyException | InternalException |
-                 InvalidResponseException | XmlParserException | ServerException | NoSuchAlgorithmException |
-                 IOException e) {
-            throw new FileStorageRuntimeException(String.format("查询文件是否存在失败,%s", e.getMessage()), e);
-        }
+        HeadObjectRequest headObjectRequest = HeadObjectRequest.builder().bucket(bucketName).key(getUrlPath(fileInfo)).build();
+        HeadObjectResponse headObjectResponse = getClient().headObject(headObjectRequest);
+        return headObjectResponse != null && headObjectResponse.contentLength() != null;
     }
 
     @Override
     public MultipartFileStorage download(FileInfo fileInfo) {
-        try (InputStream is = getClient().getObject(GetObjectArgs.builder().bucket(bucketName).object(getUrlPath(fileInfo)).build())) {
-            return new MultipartFileStorage(fileInfo.getOriginalFilename(), is);
-        } catch (ErrorResponseException | InsufficientDataException | InvalidKeyException | InternalException |
-                 InvalidResponseException | XmlParserException | ServerException | NoSuchAlgorithmException |
-                 IOException e) {
-            throw new FileStorageRuntimeException(String.format("下载文件失败,%s", e.getMessage()), e);
-        }
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder().bucket(bucketName).key(getUrlPath(fileInfo)).build();
+        ResponseInputStream<GetObjectResponse> responseResponseInputStream = getClient().getObject(getObjectRequest);
+        return new MultipartFileStorage(fileInfo.getOriginalFilename(), responseResponseInputStream);
     }
 
     @Override
     public void close() {
-        client = null;
+        client.close();
     }
 }

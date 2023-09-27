@@ -55,12 +55,14 @@ file:
         alias: local-1 # 别名
     amazonS3: # amazonS3 以及其他兼容AWS S3标准网盘
       - enable-storage: true  # 启用存储
-        access-key: ??
-        secret-key: ??
+        access-key-id: ??
+        secret-access-key: ??
+        # 地域区域，例如 cn-north-1
+        region: ??
         end-point: ??
         bucket-name: ??
         base-path: temp/ # 基础路径
-        alias: minio-1 # 别名
+        alias: amazonS3-1 # 别名
     minIO: # MinIO
       - enable-storage: true  # 启用存储
         access-key: ??
@@ -369,8 +371,6 @@ docker exec -it alist ./alist admin
 ## 待办
 
 - [ ] *Amazon S3*
-- https://docs.aws.amazon.com/zh_cn/sdk-for-java/latest/developer-guide/get-started.html
-- https://zhuanlan.zhihu.com/p/621726286
 
 - [ ] *又拍云 USS*
 
