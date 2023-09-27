@@ -6,6 +6,7 @@ import cn.wubo.file.storage.record.IFileStroageRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -17,8 +18,8 @@ public class FileStorageService implements DisposableBean {
     IFileStroageRecord fileStroageRecord;
 
 
-    public FileStorageService(CopyOnWriteArrayList<IFileStorage> fileStorageList, IFileStroageRecord fileStroageRecord) {
-        this.fileStorageList = fileStorageList;
+    public FileStorageService(List<IFileStorage> fileStorageList, IFileStroageRecord fileStroageRecord) {
+        this.fileStorageList = new CopyOnWriteArrayList<>(fileStorageList);
         this.fileStroageRecord = fileStroageRecord;
     }
 
