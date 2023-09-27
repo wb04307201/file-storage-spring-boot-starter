@@ -53,7 +53,15 @@ file:
         base-path: local/ # 基础路径
         storage-path: D:/Temp/ # 存储路径
         alias: local-1 # 别名
-    minIO: # MinIO 以及其他兼容AWS S3标准网盘
+    amazonS3: # amazonS3 以及其他兼容AWS S3标准网盘
+      - enable-storage: true  # 启用存储
+        access-key: ??
+        secret-key: ??
+        end-point: ??
+        bucket-name: ??
+        base-path: temp/ # 基础路径
+        alias: minio-1 # 别名
+    minIO: # MinIO
       - enable-storage: true  # 启用存储
         access-key: ??
         secret-key: ??
@@ -110,6 +118,30 @@ file:
         password: ?? # 密码
         alias: git-1 # 别名
 ```
+
+Amazon S3 SDK 兼容平台  
+MinIO、阿里云 OSS、华为云 OBS、七牛云 Kodo、、、、
+
+| 平台          | 说明                                                                                                                        |
+|-------------|---------------------------------------------------------------------------------------------------------------------------|
+| MinIO       | [查看](https://www.minio.org.cn/docs/minio/kubernetes/upstream/index.html)                                                  |
+| 阿里云 OSS     | [查看](https://help.aliyun.com/document_detail/64919.html#title-cds-fai-yxp)                                                |
+| 华为云 OBS     | [查看](https://support.huaweicloud.com/topic/74416-1-O-obsduixiangcunchufuwus3xieyi)                                        |
+| 七牛云 Kodo    | [查看](https://developer.qiniu.com/kodo/4086/amazon-s3-compatible)                                                          |
+| 腾讯云 COS     | [查看](https://cloud.tencent.com/document/product/436/37421)                                                                |
+| 百度云 BOS     | [查看](https://cloud.baidu.com/doc/BOS/s/Fjwvyq9xo)                                                                         |
+| 金山云 KS3     | [查看](https://docs.ksyun.com/documents/959)                                                                                |
+| 美团云 MSS     | [查看](https://www.mtyun.com/doc/products/storage/mss/zhu-yao-gong-neng#%E5%85%BC%E5%AE%B9%20AWS%20S3%20%E5%8D%8F%E8%AE%AE) |
+| 京东云 OSS     | [查看](https://docs.jdcloud.com/cn/object-storage-service/compatibility-api-overview)                                       |
+| 天翼云 OOS     | [查看](https://www.ctyun.cn/h5/help2/10000101/10001711)                                                                     |
+| 移动云 EOS     | [查看](https://ecloud.10086.cn/op-help-center/doc/article/24569)                                                            |
+| 沃云 OSS      | [查看](https://support.woyun.cn/document.html?id=133&arcid=127)                                                             |
+| 网易数帆 NOS    | [查看](https://www.163yun.com/help/documents/89796157866430464)                                                             |
+| Ucloud US3  | [查看](https://docs.ucloud.cn/ufile/s3/s3_introduction)                                                                     |
+| 青云 QingStor | [查看](https://docs.qingcloud.com/qingstor/s3/)                                                                             |
+| 平安云 OBS     | [查看](https://yun.pingan.com/ssr/help/storage/obs/OBS_SDK_.Java_SDK_)                                                      |
+| 首云 OSS      | [查看](http://www.capitalonline.net.cn/zh-cn/service/distribution/oss-new/#product-adv)                                     |
+| IBM COS     | [查看](https://cloud.ibm.com/docs/cloud-object-storage?topic=cloud-object-storage-compatibility-api)                        |
 
 ## 第五步 注入FileStorageServiceb并调用文件存储功能
 
@@ -335,6 +367,14 @@ docker exec -it alist ./alist admin
 ```
 
 ## 待办
+
+- [ ] *Amazon S3*
+- https://docs.aws.amazon.com/zh_cn/sdk-for-java/latest/developer-guide/get-started.html
+- https://zhuanlan.zhihu.com/p/621726286
+
+- [ ] *又拍云 USS*
+
+- [ ] *谷歌云存储*
 
 - [ ] *扩展对FTP的支持*
 

@@ -35,6 +35,13 @@
             </dependency>
 
             <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>bom</artifactId>
+                <version>2.20.155</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
                 <groupId>io.minio</groupId>
                 <artifactId>minio</artifactId>
                 <version>8.5.2</version>
@@ -95,6 +102,11 @@
             <artifactId>logback-classic</artifactId>
         </dependency>
 
+        <!-- Amazon S3 -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
+        </dependency>
         <!-- MinIO -->
         <dependency>
             <groupId>io.minio</groupId>
