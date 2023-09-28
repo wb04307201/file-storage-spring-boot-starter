@@ -121,12 +121,12 @@ file:
         alias: git-1 # 别名
 ```
 
-Amazon S3 SDK 兼容其他平台
+Amazon S3 SDK 与其他平台兼容性
 | 平台          | 说明                                                                                                                        |
 |-------------|---------------------------------------------------------------------------------------------------------------------------|
 | MinIO       | [查看](https://www.minio.org.cn/docs/minio/kubernetes/upstream/index.html)                                                  |
 | 阿里云 OSS     | [查看](https://help.aliyun.com/document_detail/64919.html#title-cds-fai-yxp)                                                |
-| 华为云 OBS     | [查看](https://support.huaweicloud.com/topic/74416-1-O-obsduixiangcunchufuwus3xieyi)                                        |
+| 华为云 OBS     | [查看](https://support.huaweicloud.com/sdk-java-devg-obs/obs_21_2123.html)                                        |
 | 七牛云 Kodo    | [查看](https://developer.qiniu.com/kodo/4086/amazon-s3-compatible)                                                          |
 | 腾讯云 COS     | [查看](https://cloud.tencent.com/document/product/436/37421)                                                                |
 | 百度云 BOS     | [查看](https://cloud.baidu.com/doc/BOS/s/Fjwvyq9xo)                                                                         |
