@@ -3,6 +3,7 @@ package cn.wubo.file.storage.core;
 import cn.wubo.file.storage.exception.FileStorageRuntimeException;
 import cn.wubo.file.storage.platform.IFileStorage;
 import cn.wubo.file.storage.record.IFileStroageRecord;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 
@@ -15,8 +16,8 @@ public class FileStorageService implements DisposableBean {
 
     CopyOnWriteArrayList<IFileStorage> fileStorageList;
 
+    @Getter
     IFileStroageRecord fileStroageRecord;
-
 
     public FileStorageService(List<IFileStorage> fileStorageList, IFileStroageRecord fileStroageRecord) {
         this.fileStorageList = new CopyOnWriteArrayList<>(fileStorageList);
@@ -24,9 +25,7 @@ public class FileStorageService implements DisposableBean {
     }
 
     private IFileStorage getFileStorage(String alias) {
-        Optional<IFileStorage> fileStorageOptional = fileStorageList.stream()
-                .filter(fileStorage -> fileStorage.supportAlias(alias))
-                .findAny();
+        Optional<IFileStorage> fileStorageOptional = fileStorageList.stream().filter(fileStorage -> fileStorage.supportAlias(alias)).findAny();
         if (fileStorageOptional.isPresent()) {
             IFileStorage fileStorage = fileStorageOptional.get();
             log.debug("找到存储 {} 成功", fileStorage.getPlatformAlias());

@@ -2,6 +2,7 @@ package cn.wubo.file.storage.config;
 
 
 import cn.wubo.file.storage.platform.aliyunOSS.AliyunOSS;
+import cn.wubo.file.storage.platform.amazonS3.AmazonS3;
 import cn.wubo.file.storage.platform.baiduBOS.BaiduBOS;
 import cn.wubo.file.storage.platform.git.Git;
 import cn.wubo.file.storage.platform.huaweiOBS.HuaweiOBS;
@@ -20,6 +21,7 @@ import java.util.List;
 public class FileStorageProperties {
     private String fileStorageRecord = "cn.wubo.file.storage.record.impl.MemFileStroageRecordImpl";
     private List<Local> local = new ArrayList<>();
+    private List<AmazonS3> amazonS3 = new ArrayList<>();
     private List<MinIO> minIO = new ArrayList<>();
     private List<HuaweiOBS> huaweiOBS = new ArrayList<>();
     private List<BaiduBOS> baiduBOS = new ArrayList<>();

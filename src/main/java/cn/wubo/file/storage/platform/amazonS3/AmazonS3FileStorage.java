@@ -6,15 +6,18 @@ import cn.wubo.file.storage.platform.base.BaseFileStorage;
 import cn.wubo.file.storage.utils.FileUtils;
 import cn.wubo.file.storage.utils.UrlUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3ClientBuilder;
 import software.amazon.awssdk.services.s3.S3Configuration;
 import software.amazon.awssdk.services.s3.model.*;
 
+import java.net.URI;
 import java.util.Date;
 
 @Slf4j
@@ -40,7 +43,9 @@ public class AmazonS3FileStorage extends BaseFileStorage {
         if (client == null) {
             AwsBasicCredentials awsBasicCredentials = AwsBasicCredentials.create(accessKeyId, secretAccessKey);
             S3Configuration s3Config = S3Configuration.builder().pathStyleAccessEnabled(true).build();
-            client = S3Client.builder().credentialsProvider(StaticCredentialsProvider.create(awsBasicCredentials)).region(region).serviceConfiguration(s3Config).build();
+            S3ClientBuilder s3ClientBuilder = S3Client.builder().credentialsProvider(StaticCredentialsProvider.create(awsBasicCredentials)).region(region).serviceConfiguration(s3Config);
+            if (StringUtils.hasText(endPoint)) s3ClientBuilder.endpointOverride(URI.create(endPoint));
+            client = s3ClientBuilder.build();
         }
         return client;
     }

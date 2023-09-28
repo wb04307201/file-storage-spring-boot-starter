@@ -8,6 +8,7 @@ import cn.wubo.file.storage.page.FileStorageDownloadServlet;
 import cn.wubo.file.storage.page.FileStorageListServlet;
 import cn.wubo.file.storage.platform.IFileStorage;
 import cn.wubo.file.storage.platform.aliyunOSS.AliyunOSSFileStorage;
+import cn.wubo.file.storage.platform.amazonS3.AmazonS3FileStorage;
 import cn.wubo.file.storage.platform.baiduBOS.BaiduBOSFileStorage;
 import cn.wubo.file.storage.platform.base.BasePlatform;
 import cn.wubo.file.storage.platform.git.GitFileStorage;
@@ -51,6 +52,15 @@ public class FileStorageConfiguration {
     @Bean
     public List<LocalFileStorage> localFileStorageList() {
         return properties.getLocal().stream().filter(BasePlatform::getEnableStorage).map(LocalFileStorage::new).collect(Collectors.toList());
+    }
+
+    /**
+     * AmazonS3 存储 Bean
+     */
+    @Bean
+    @ConditionalOnClass(name = "software.amazon.awssdk.services.s3.S3Client")
+    public List<AmazonS3FileStorage> amazonS3FileStorageList() {
+        return properties.getAmazonS3().stream().filter(BasePlatform::getEnableStorage).map(AmazonS3FileStorage::new).collect(Collectors.toList());
     }
 
     /**

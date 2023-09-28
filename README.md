@@ -25,7 +25,7 @@
 <dependency>
     <groupId>com.gitee.wb04307201</groupId>
     <artifactId>file-storage-spring-boot-starter</artifactId>
-    <version>1.0.8</version>
+    <version>1.0.9</version>
 </dependency>
 ```
 
@@ -121,9 +121,7 @@ file:
         alias: git-1 # 别名
 ```
 
-Amazon S3 SDK 兼容平台  
-MinIO、阿里云 OSS、华为云 OBS、七牛云 Kodo、、、、
-
+Amazon S3 SDK 兼容其他平台
 | 平台          | 说明                                                                                                                        |
 |-------------|---------------------------------------------------------------------------------------------------------------------------|
 | MinIO       | [查看](https://www.minio.org.cn/docs/minio/kubernetes/upstream/index.html)                                                  |
@@ -347,7 +345,7 @@ public class H2FileStroageRecordImpl implements IFileStroageRecord {
 ```yaml
 file:
   storage:
-    file-storage-record: cn.wubo.chatbot.demo.H2ChatbotRecordImpl
+    file-storage-record: cn.wubo.file.storage.demo.H2FileStroageRecordImpl
 ```
 
 ## 其他3：docker安装MinIO
@@ -369,8 +367,6 @@ docker exec -it alist ./alist admin
 ```
 
 ## 待办
-
-- [ ] *Amazon S3*
 
 - [ ] *又拍云 USS*
 
