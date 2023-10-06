@@ -29,7 +29,12 @@ public class MemFileStroageRecordImpl implements IFileStroageRecord {
 
     @Override
     public List<FileInfo> list(FileInfo fileInfo) {
-        return fileInfos.stream().filter(e -> !StringUtils.hasLength(fileInfo.getPlatform()) || fileInfo.getPlatform().equals(e.getPlatform())).filter(e -> !StringUtils.hasLength(fileInfo.getAlias()) || fileInfo.getAlias().contains(e.getAlias())).filter(e -> !StringUtils.hasLength(fileInfo.getOriginalFilename()) || fileInfo.getOriginalFilename().contains(e.getOriginalFilename())).collect(Collectors.toList());
+        return fileInfos.stream()
+                .filter(e -> !StringUtils.hasLength(fileInfo.getId()) || fileInfo.getId().equals(e.getId()))
+                .filter(e -> !StringUtils.hasLength(fileInfo.getPlatform()) || fileInfo.getPlatform().equals(e.getPlatform()))
+                .filter(e -> !StringUtils.hasLength(fileInfo.getAlias()) || fileInfo.getAlias().contains(e.getAlias()))
+                .filter(e -> !StringUtils.hasLength(fileInfo.getOriginalFilename()) || fileInfo.getOriginalFilename().contains(e.getOriginalFilename()))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -41,7 +46,7 @@ public class MemFileStroageRecordImpl implements IFileStroageRecord {
 
     @Override
     public Boolean delete(FileInfo fileInfo) {
-        return fileInfos.remove(fileInfo);
+        return fileInfos.removeAll(list(fileInfo));
     }
 
     @Override

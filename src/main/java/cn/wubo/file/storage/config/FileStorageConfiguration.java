@@ -3,9 +3,6 @@ package cn.wubo.file.storage.config;
 
 import cn.wubo.file.storage.core.FileStorageService;
 import cn.wubo.file.storage.exception.FileStorageRuntimeException;
-import cn.wubo.file.storage.page.FileStorageDeleteServlet;
-import cn.wubo.file.storage.page.FileStorageDownloadServlet;
-import cn.wubo.file.storage.page.FileStorageListServlet;
 import cn.wubo.file.storage.platform.IFileStorage;
 import cn.wubo.file.storage.platform.aliyunOSS.AliyunOSSFileStorage;
 import cn.wubo.file.storage.platform.amazonS3.AmazonS3FileStorage;
@@ -19,6 +16,9 @@ import cn.wubo.file.storage.platform.tencentCOS.TencentCOSFileStorage;
 import cn.wubo.file.storage.platform.webDAV.WebDAVFileStorage;
 import cn.wubo.file.storage.record.IFileStroageRecord;
 import cn.wubo.file.storage.record.impl.MemFileStroageRecordImpl;
+import cn.wubo.file.storage.servlet.FileStorageDeleteServlet;
+import cn.wubo.file.storage.servlet.FileStorageDownloadServlet;
+import cn.wubo.file.storage.servlet.FileStorageListServlet;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
@@ -134,9 +134,9 @@ public class FileStorageConfiguration {
     }
 
     @Bean
-    public ServletRegistrationBean<HttpServlet> fileStorageListServlet(List<IFileStroageRecord> fileStroageRecordList) {
+    public ServletRegistrationBean<HttpServlet> fileStorageListServlet(FileStorageService fileStorageService) {
         ServletRegistrationBean<HttpServlet> registration = new ServletRegistrationBean<>();
-        registration.setServlet(new FileStorageListServlet(fileStroageRecordList.stream().filter(obj -> obj.getClass().getName().equals(properties.getFileStorageRecord())).findAny().orElseThrow(() -> new FileStorageRuntimeException(String.format("未找到%s对应的bean，无法加载IFileStroageRecord！", properties.getFileStorageRecord())))));
+        registration.setServlet(new FileStorageListServlet(fileStorageService));
         registration.addUrlMappings("/file/storage/list");
         return registration;
     }

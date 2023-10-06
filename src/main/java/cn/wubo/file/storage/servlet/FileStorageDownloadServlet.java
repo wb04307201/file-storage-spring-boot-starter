@@ -1,4 +1,4 @@
-package cn.wubo.file.storage.page;
+package cn.wubo.file.storage.servlet;
 
 import cn.wubo.file.storage.core.FileStorageService;
 import cn.wubo.file.storage.core.MultipartFileStorage;

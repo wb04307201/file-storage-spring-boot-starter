@@ -1,12 +1,12 @@
-package cn.wubo.file.storage.page;
+package cn.wubo.file.storage.servlet;
 
 import cn.wubo.file.storage.core.FileInfo;
+import cn.wubo.file.storage.core.FileStorageService;
 import cn.wubo.file.storage.exception.FileStorageRuntimeException;
 import cn.wubo.file.storage.record.IFileStroageRecord;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -19,16 +19,15 @@ import java.util.Map;
 @Slf4j
 public class FileStorageListServlet extends HttpServlet {
 
-    private IFileStroageRecord fileStroageRecord;
+    private FileStorageService fileStorageService;
 
-    public FileStorageListServlet(IFileStroageRecord fileStroageRecord) {
-        this.fileStroageRecord = fileStroageRecord;
+    public FileStorageListServlet(FileStorageService fileStorageService) {
+        this.fileStorageService = fileStorageService;
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String contextPath = req.getContextPath();
-        if (fileStroageRecord != null) {
             Map<String, Object> data = new HashMap<>();
 
             FileInfo fileInfo = new FileInfo();
@@ -39,7 +38,7 @@ public class FileStorageListServlet extends HttpServlet {
                 fileInfo.setOriginalFilename(map.get("originalFilename")[0]);
             }
 
-            data.put("list", fileStroageRecord.list(fileInfo));
+            data.put("list", fileStorageService.list(fileInfo));
             data.put("contextPath", contextPath);
             data.put("query", fileInfo);
 
@@ -52,12 +51,6 @@ public class FileStorageListServlet extends HttpServlet {
             } catch (TemplateException e) {
                 throw new FileStorageRuntimeException(e.getMessage(), e);
             }
-        } else {
-            log.debug("contextPath========{}", contextPath);
-            String servletPath = req.getServletPath();
-            log.debug("servletPath========{}", servletPath);
-            super.doGet(req, resp);
-        }
     }
 
     @Override

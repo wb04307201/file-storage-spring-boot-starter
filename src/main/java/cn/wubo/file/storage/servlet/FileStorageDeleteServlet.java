@@ -1,11 +1,7 @@
-package cn.wubo.file.storage.page;
+package cn.wubo.file.storage.servlet;
 
 import cn.wubo.file.storage.core.FileInfo;
 import cn.wubo.file.storage.core.FileStorageService;
-import cn.wubo.file.storage.exception.FileStorageRuntimeException;
-import cn.wubo.file.storage.record.IFileStroageRecord;
-import freemarker.template.Template;
-import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.ServletException;
@@ -13,8 +9,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 @Slf4j
 public class FileStorageDeleteServlet extends HttpServlet {

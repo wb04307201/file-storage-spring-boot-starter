@@ -40,28 +40,23 @@ public class FileStorageService implements DisposableBean {
         return fileStroageRecord.save(fileInfo);
     }
 
-    public Boolean delete(FileInfo fileInfo) {
-        return getFileStorage(fileInfo.getAlias()).delete(fileInfo) && fileStroageRecord.delete(fileInfo);
+    public List<FileInfo> list(FileInfo fileInfo) {
+        return fileStroageRecord.list(fileInfo);
     }
 
     public Boolean delete(String id) {
-        return delete(fileStroageRecord.findById(id));
-    }
-
-    public Boolean exists(FileInfo fileInfo) {
-        return getFileStorage(fileInfo.getAlias()).exists(fileInfo);
+        FileInfo fileInfo = fileStroageRecord.findById(id);
+        return getFileStorage(fileInfo.getAlias()).delete(fileInfo) && fileStroageRecord.delete(fileInfo);
     }
 
     public Boolean exists(String id) {
-        return exists(fileStroageRecord.findById(id));
-    }
-
-    public MultipartFileStorage download(FileInfo fileInfo) {
-        return getFileStorage(fileInfo.getAlias()).download(fileInfo);
+        FileInfo fileInfo = fileStroageRecord.findById(id);
+        return getFileStorage(fileInfo.getAlias()).exists(fileInfo);
     }
 
     public MultipartFileStorage download(String id) {
-        return download(fileStroageRecord.findById(id));
+        FileInfo fileInfo = fileStroageRecord.findById(id);
+        return getFileStorage(fileInfo.getAlias()).download(fileInfo);
     }
 
     @Override
