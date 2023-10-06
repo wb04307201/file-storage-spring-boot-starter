@@ -18,7 +18,7 @@ import java.util.Map;
 @Slf4j
 public class FileStorageListServlet extends HttpServlet {
 
-    private FileStorageService fileStorageService;
+    private final FileStorageService fileStorageService;
 
     public FileStorageListServlet(FileStorageService fileStorageService) {
         this.fileStorageService = fileStorageService;

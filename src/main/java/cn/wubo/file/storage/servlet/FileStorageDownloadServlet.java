@@ -17,7 +17,7 @@ import java.util.Objects;
 @Slf4j
 public class FileStorageDownloadServlet extends HttpServlet {
 
-    private FileStorageService fileStorageService;
+    private final FileStorageService fileStorageService;
 
     public FileStorageDownloadServlet(FileStorageService fileStorageService) {
         this.fileStorageService = fileStorageService;

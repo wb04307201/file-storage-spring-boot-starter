@@ -13,7 +13,7 @@ import java.io.IOException;
 @Slf4j
 public class FileStorageDeleteServlet extends HttpServlet {
 
-    private FileStorageService fileStorageService;
+    private final FileStorageService fileStorageService;
 
     public FileStorageDeleteServlet(FileStorageService fileStorageService) {
         this.fileStorageService = fileStorageService;
