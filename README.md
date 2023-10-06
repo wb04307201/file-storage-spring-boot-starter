@@ -147,37 +147,39 @@ Amazon S3 SDK 与其他平台兼容性
 
 ## 第五步 注入FileStorageServiceb并调用文件存储功能
 
-```yaml
+```java
 @Controller
 public class PageController {
 
     @Autowired
     FileStorageService fileStorageService;
 
-    @Autowired
-    IFileStroageRecord fileStroageRecord;
-
-    /** 测试用平台别名 **/
+    /**
+     * 测试用平台别名
+     **/
     private String alias = "local-1";
     //private String alias = "minio-1";
     //private String alias = "webDAV-1";
     //private String alias = "git-1";
+    //private String alias = "amazonS3-1";
 
     /**
      * 查询显示列表
+     *
      * @param model
      * @param fileInfo
      * @return
      */
     @PostMapping(value = "/list")
     public String upload(Model model, FileInfo fileInfo) {
-        model.addAttribute("list", fileStroageRecord.list(fileInfo));
+        model.addAttribute("list", fileStorageService.getFileStroageRecord().list(fileInfo));
         model.addAttribute("query", fileInfo);
         return "list";
     }
 
     /**
      * 上传文件
+     *
      * @param file
      * @param model
      * @return
@@ -186,26 +188,28 @@ public class PageController {
     public String upload(MultipartFile file, Model model) {
         fileStorageService.save(new MultipartFileStorage(file).setAlias(alias).setPath("ttt"));
         FileInfo fileInfo = new FileInfo();
-        model.addAttribute("list", fileStroageRecord.list(fileInfo));
+        model.addAttribute("list", fileStorageService.getFileStroageRecord().list(fileInfo));
         model.addAttribute("query", fileInfo);
         return "list";
     }
 
     /**
      * 显示列表
+     *
      * @param model
      * @return
      */
     @GetMapping(value = "/list")
     public String upload(Model model) {
         FileInfo fileInfo = new FileInfo();
-        model.addAttribute("list", fileStroageRecord.list(fileInfo));
+        model.addAttribute("list", fileStorageService.getFileStroageRecord().list(fileInfo));
         model.addAttribute("query", fileInfo);
         return "list";
     }
 
     /**
      * 删除文件
+     *
      * @param req
      * @param model
      * @return
@@ -215,13 +219,14 @@ public class PageController {
         String id = req.getParameter("id");
         fileStorageService.delete(id);
         FileInfo fileInfo = new FileInfo();
-        model.addAttribute("list", fileStroageRecord.list(fileInfo));
+        model.addAttribute("list", fileStorageService.getFileStroageRecord().list(fileInfo));
         model.addAttribute("query", fileInfo);
         return "list";
     }
 
     /**
      * 下载文件
+     *
      * @param req
      * @param resp
      */
@@ -282,6 +287,7 @@ public class H2FileStroageRecordImpl implements IFileStroageRecord {
             String sql = ModelSqlUtils.selectSql(HISTORY, new FileInfo());
 
             List<String> condition = new ArrayList<>();
+            if (StringUtils.hasLength(fileInfo.getId())) condition.add(" id = '" + fileInfo.getId() + "'");
             if (StringUtils.hasLength(fileInfo.getPlatform()))
                 condition.add(" platform = '" + fileInfo.getPlatform() + "'");
             if (StringUtils.hasLength(fileInfo.getAlias()))
@@ -316,14 +322,20 @@ public class H2FileStroageRecordImpl implements IFileStroageRecord {
 
     @Override
     public Boolean delete(FileInfo fileInfo) {
-        FileInfo delete = new FileInfo();
-        delete.setId(fileInfo.getId());
-        String sql = ModelSqlUtils.deleteByIdSql(HISTORY, delete);
+        List<FileInfo> fileInfos = list(fileInfo);
         try {
             Connection conn = connectionPool.getConnection();
-            int count = ExecuteSqlUtils.executeUpdate(conn, sql, new HashMap<>());
+            conn.setAutoCommit(false);
+            AtomicInteger count = new AtomicInteger();
+            fileInfos.stream().forEach(e -> {
+                FileInfo delete = new FileInfo();
+                delete.setId(e.getId());
+                String sql = ModelSqlUtils.deleteByIdSql(HISTORY, delete);
+                count.addAndGet(ExecuteSqlUtils.executeUpdate(conn, sql, new HashMap<>()));
+            });
+            conn.commit();
             connectionPool.returnConnection(conn);
-            return count == 1;
+            return count.get() > 0;
         } catch (SQLException | InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -333,7 +345,7 @@ public class H2FileStroageRecordImpl implements IFileStroageRecord {
     public void init() {
         try {
             Connection conn = connectionPool.getConnection();
-            if (!ExecuteSqlUtils.isTableExists(conn, HISTORY, connectionPool.getDbType())) {
+            if (!ExecuteSqlUtils.isTableExists(conn, HISTORY, DbType.h2)) {
                 ExecuteSqlUtils.executeUpdate(conn, ModelSqlUtils.createSql(HISTORY, new FileInfo()), new HashMap<>());
             }
         } catch (SQLException | InterruptedException e) {
