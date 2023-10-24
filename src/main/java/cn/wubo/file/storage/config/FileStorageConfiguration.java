@@ -1,7 +1,9 @@
 package cn.wubo.file.storage.config;
 
 
+import cn.wubo.file.storage.core.FileInfo;
 import cn.wubo.file.storage.core.FileStorageService;
+import cn.wubo.file.storage.core.MultipartFileStorage;
 import cn.wubo.file.storage.exception.FileStorageRuntimeException;
 import cn.wubo.file.storage.platform.IFileStorage;
 import cn.wubo.file.storage.platform.aliyunOSS.AliyunOSSFileStorage;
@@ -16,19 +18,26 @@ import cn.wubo.file.storage.platform.tencentCOS.TencentCOSFileStorage;
 import cn.wubo.file.storage.platform.webDAV.WebDAVFileStorage;
 import cn.wubo.file.storage.record.IFileStroageRecord;
 import cn.wubo.file.storage.record.impl.MemFileStroageRecordImpl;
-import cn.wubo.file.storage.servlet.FileStorageDeleteServlet;
-import cn.wubo.file.storage.servlet.FileStorageDownloadServlet;
-import cn.wubo.file.storage.servlet.FileStorageListServlet;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.servlet.function.*;
+import org.springframework.web.util.HtmlUtils;
 
-import javax.servlet.http.HttpServlet;
-import java.util.Collection;
-import java.util.List;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 @Configuration
@@ -133,28 +142,48 @@ public class FileStorageConfiguration {
         return new FileStorageService(new CopyOnWriteArrayList<>(fileStorageLists.stream().flatMap(Collection::stream).collect(Collectors.toList())), fileStroageRecord);
     }
 
-    @Bean
-    public ServletRegistrationBean<HttpServlet> fileStorageListServlet(FileStorageService fileStorageService) {
-        ServletRegistrationBean<HttpServlet> registration = new ServletRegistrationBean<>();
-        registration.setServlet(new FileStorageListServlet(fileStorageService));
-        registration.addUrlMappings("/file/storage/list");
-        return registration;
-    }
+    @Bean("wb04307201_file_storage_router")
+    public RouterFunction<ServerResponse> fileStorageRouter(FileStorageService fileStorageService) {
+        BiFunction<ServerRequest, FileStorageService, ServerResponse> listFunction = (request, service) -> {
+            String contextPath = request.requestPath().contextPath().value();
+            Map<String, Object> data = new HashMap<>();
+            FileInfo fileInfo = new FileInfo();
+            try {
+                if (HttpMethod.POST.equals(request.method())) {
+                    MultiValueMap<String, String> params = request.params();
+                    fileInfo.setPlatform(params.getFirst("platform"));
+                    fileInfo.setAlias(params.getFirst("alias"));
+                    fileInfo.setOriginalFilename(params.getFirst("originalFilename"));
+                }
+                data.put("list", service.list(fileInfo));
+                data.put("contextPath", contextPath);
+                fileInfo.setAlias(HtmlUtils.htmlEscape(fileInfo.getAlias() == null ? "" : fileInfo.getAlias()));
+                fileInfo.setOriginalFilename(HtmlUtils.htmlEscape(fileInfo.getOriginalFilename() == null ? "" : fileInfo.getOriginalFilename()));
+                data.put("query", fileInfo);
+                StringWriter sw = new StringWriter();
+                freemarker.template.Configuration cfg = new freemarker.template.Configuration(freemarker.template.Configuration.VERSION_2_3_23);
+                cfg.setClassForTemplateLoading(this.getClass(), "/template");
+                Template template = cfg.getTemplate("list.ftl", "UTF-8");
+                template.process(data, sw);
+                return ServerResponse.ok().contentType(MediaType.TEXT_HTML).body(sw.toString());
+            } catch (IOException | TemplateException e) {
+                throw new FileStorageRuntimeException(e.getMessage(), e);
+            }
+        };
 
-    @Bean
-    public ServletRegistrationBean<HttpServlet> fileStorageDeleteServlet(FileStorageService fileStorageService) {
-        ServletRegistrationBean<HttpServlet> registration = new ServletRegistrationBean<>();
-        registration.setServlet(new FileStorageDeleteServlet(fileStorageService));
-        registration.addUrlMappings("/file/storage/delete");
-        return registration;
+        return RouterFunctions.route().GET("/file/storage/list", RequestPredicates.accept(MediaType.TEXT_HTML), request -> listFunction.apply(request, fileStorageService)).POST("/file/storage/list", RequestPredicates.accept(MediaType.APPLICATION_FORM_URLENCODED), request -> listFunction.apply(request, fileStorageService)).GET("/file/storage/delete", RequestPredicates.accept(MediaType.TEXT_HTML), request -> {
+            Optional<String> optionalId = request.param("id");
+            if (optionalId.isPresent()) fileStorageService.delete(optionalId.get());
+            else throw new IllegalArgumentException("请求参数id不能为空");
+            return listFunction.apply(request, fileStorageService);
+        }).GET("/file/storage/download", RequestPredicates.accept(MediaType.TEXT_HTML), request -> {
+            Optional<String> optionalId = request.param("id");
+            if (optionalId.isPresent()) {
+                MultipartFileStorage file = fileStorageService.download(optionalId.get());
+                try (InputStream is = new ByteArrayInputStream(file.getBytes())) {
+                    return ServerResponse.ok().contentType(MediaType.parseMediaType(file.getContentType())).contentLength(file.getSize()).header("Content-Disposition", "attachment;filename=" + new String(Objects.requireNonNull(file.getOriginalFilename()).getBytes(), StandardCharsets.ISO_8859_1)).body(is);
+                }
+            } else throw new IllegalArgumentException("请求参数id不能为空");
+        }).build();
     }
-
-    @Bean
-    public ServletRegistrationBean<HttpServlet> fileStorageDownloadServlet(FileStorageService fileStorageService) {
-        ServletRegistrationBean<HttpServlet> registration = new ServletRegistrationBean<>();
-        registration.setServlet(new FileStorageDownloadServlet(fileStorageService));
-        registration.addUrlMappings("/file/storage/download");
-        return registration;
-    }
-
 }
