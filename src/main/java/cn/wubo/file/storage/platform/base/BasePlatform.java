@@ -11,7 +11,7 @@ public class BasePlatform {
     /**
      * 启用存储
      */
-    private Boolean enableStorage = false;
+    private Boolean enableStorage = true;
     /**
      * 基础路径
      */
