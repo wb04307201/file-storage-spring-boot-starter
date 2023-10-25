@@ -49,12 +49,12 @@ public class FileStorageDemoApplication {
 file:
   storage: #文件存储配置，不使用的情况下可以不写
     local: # 本地存储
-      - enable-storage: true  #启用存储
+      - enable-storage: true  #启用存储，默认为true，关闭false
         base-path: local/ # 基础路径
         storage-path: D:/Temp/ # 存储路径
         alias: local-1 # 别名
     amazonS3: # amazonS3 以及其他兼容AWS S3标准网盘
-      - enable-storage: true  # 启用存储
+      - enable-storage: true  # 启用存储，默认为true，关闭false
         access-key-id: ??
         secret-access-key: ??
         # 地域区域，例如 cn-north-1
@@ -64,7 +64,7 @@ file:
         base-path: temp/ # 基础路径
         alias: amazonS3-1 # 别名
     minIO: # MinIO
-      - enable-storage: true  # 启用存储
+      - enable-storage: true  # 启用存储，默认为true，关闭false
         access-key: ??
         secret-key: ??
         end-point: ??
@@ -72,7 +72,7 @@ file:
         base-path: temp/ # 基础路径
         alias: minio-1 # 别名
     huaweiOBS: #HuaweiOBS
-      - enable-storage: true  # 启用存储
+      - enable-storage: true  # 启用存储，默认为true，关闭false
         access-key: ??
         secret-key: ??
         end-point: ??
@@ -80,7 +80,7 @@ file:
         base-path: temp/ # 基础路径
         alias: huaweiOBS-1 # 别名
     baiduBOS: #BaiduBOS
-      - enable-storage: true  # 启用存储
+      - enable-storage: true  # 启用存储，默认为true，关闭false
         access-key: ??
         secret-key: ??
         end-point: ??
@@ -88,7 +88,7 @@ file:
         base-path: temp/ # 基础路径
         alias: baiduBOS-1 # 别名
     aliyunOSS: #AliyunOSS
-      - enable-storage: true  # 启用存储
+      - enable-storage: true  # 启用存储，默认为true，关闭false
         access-key: ??
         secret-key: ??
         end-point: ??
@@ -96,7 +96,7 @@ file:
         base-path: temp/ # 基础路径
         alias: aliyunOSS-1 # 别名
     tencentCOS: #TencentCOS
-      - enable-storage: true  # 启用存储
+      - enable-storage: true  # 启用存储，默认为true，关闭false
         secret-id: ??
         secret-key: ??
         end-point: ??
@@ -104,7 +104,7 @@ file:
         base-path: temp/ # 基础路径
         alias: tencentCOS-1 # 别名
     webDAV: #WebDAV
-      - enable-storage: true  #启用存储
+      - enable-storage: true  #启用存储，默认为true，关闭false
         base-path: temp/ # 基础路径
         storage-path: /aliyun/ # 存储路径
         server: http://127.0.0.1:5244 # Git仓库地址
@@ -112,7 +112,7 @@ file:
         password: q54U4YJb # 密码
         alias: webDAV-1 # 别名
     git: #Git
-      - enable-storage: true  #启用存储
+      - enable-storage: true  #启用存储，默认为true，关闭false
         base-path: git/ # 基础路径
         storage-path: D:/GitTemp/ # 存储路径,会将仓库clone到这个目录
         repo: https://gitee.com/??/?? # Git仓库地址
