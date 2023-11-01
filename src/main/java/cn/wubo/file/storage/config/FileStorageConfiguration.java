@@ -148,7 +148,7 @@ public class FileStorageConfiguration {
             String contextPath = request.requestPath().contextPath().value();
             Map<String, Object> data = new HashMap<>();
             FileInfo fileInfo = new FileInfo();
-            try {
+            try (StringWriter sw = new StringWriter()) {
                 if (HttpMethod.POST.equals(request.method())) {
                     MultiValueMap<String, String> params = request.params();
                     fileInfo.setPlatform(params.getFirst("platform"));
@@ -160,7 +160,6 @@ public class FileStorageConfiguration {
                 fileInfo.setAlias(HtmlUtils.htmlEscape(fileInfo.getAlias() == null ? "" : fileInfo.getAlias()));
                 fileInfo.setOriginalFilename(HtmlUtils.htmlEscape(fileInfo.getOriginalFilename() == null ? "" : fileInfo.getOriginalFilename()));
                 data.put("query", fileInfo);
-                StringWriter sw = new StringWriter();
                 freemarker.template.Configuration cfg = new freemarker.template.Configuration(freemarker.template.Configuration.VERSION_2_3_23);
                 cfg.setClassForTemplateLoading(this.getClass(), "/template");
                 Template template = cfg.getTemplate("list.ftl", "UTF-8");
