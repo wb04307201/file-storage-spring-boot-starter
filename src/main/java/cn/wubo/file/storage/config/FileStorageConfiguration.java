@@ -18,6 +18,7 @@ import cn.wubo.file.storage.platform.tencentCOS.TencentCOSFileStorage;
 import cn.wubo.file.storage.platform.webDAV.WebDAVFileStorage;
 import cn.wubo.file.storage.record.IFileStroageRecord;
 import cn.wubo.file.storage.record.impl.MemFileStroageRecordImpl;
+import cn.wubo.file.storage.utils.PageUtils;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -148,26 +149,18 @@ public class FileStorageConfiguration {
             String contextPath = request.requestPath().contextPath().value();
             Map<String, Object> data = new HashMap<>();
             FileInfo fileInfo = new FileInfo();
-            try (StringWriter sw = new StringWriter()) {
-                if (HttpMethod.POST.equals(request.method())) {
-                    MultiValueMap<String, String> params = request.params();
-                    fileInfo.setPlatform(params.getFirst("platform"));
-                    fileInfo.setAlias(params.getFirst("alias"));
-                    fileInfo.setOriginalFilename(params.getFirst("originalFilename"));
-                }
-                data.put("list", service.list(fileInfo));
-                data.put("contextPath", contextPath);
-                fileInfo.setAlias(HtmlUtils.htmlEscape(fileInfo.getAlias() == null ? "" : fileInfo.getAlias()));
-                fileInfo.setOriginalFilename(HtmlUtils.htmlEscape(fileInfo.getOriginalFilename() == null ? "" : fileInfo.getOriginalFilename()));
-                data.put("query", fileInfo);
-                freemarker.template.Configuration cfg = new freemarker.template.Configuration(freemarker.template.Configuration.VERSION_2_3_23);
-                cfg.setClassForTemplateLoading(this.getClass(), "/template");
-                Template template = cfg.getTemplate("list.ftl", "UTF-8");
-                template.process(data, sw);
-                return ServerResponse.ok().contentType(MediaType.TEXT_HTML).body(sw.toString());
-            } catch (IOException | TemplateException e) {
-                throw new FileStorageRuntimeException(e.getMessage(), e);
+            if (HttpMethod.POST.equals(request.method())) {
+                MultiValueMap<String, String> params = request.params();
+                fileInfo.setPlatform(params.getFirst("platform"));
+                fileInfo.setAlias(params.getFirst("alias"));
+                fileInfo.setOriginalFilename(params.getFirst("originalFilename"));
             }
+            data.put("list", service.list(fileInfo));
+            data.put("contextPath", contextPath);
+            fileInfo.setAlias(HtmlUtils.htmlEscape(fileInfo.getAlias() == null ? "" : fileInfo.getAlias()));
+            fileInfo.setOriginalFilename(HtmlUtils.htmlEscape(fileInfo.getOriginalFilename() == null ? "" : fileInfo.getOriginalFilename()));
+            data.put("query", fileInfo);
+            return ServerResponse.ok().contentType(MediaType.TEXT_HTML).body(PageUtils.write("list.ftl",data));
         };
 
         return RouterFunctions.route().GET("/file/storage/list", RequestPredicates.accept(MediaType.TEXT_HTML), request -> listFunction.apply(request, fileStorageService)).POST("/file/storage/list", RequestPredicates.accept(MediaType.APPLICATION_FORM_URLENCODED), request -> listFunction.apply(request, fileStorageService)).GET("/file/storage/delete", RequestPredicates.accept(MediaType.TEXT_HTML), request -> {
