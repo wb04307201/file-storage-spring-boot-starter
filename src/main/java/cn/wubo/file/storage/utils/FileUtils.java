@@ -10,6 +10,9 @@ import java.util.UUID;
 
 public class FileUtils {
 
+    private FileUtils() {
+    }
+
     /**
      * 特殊后缀
      */

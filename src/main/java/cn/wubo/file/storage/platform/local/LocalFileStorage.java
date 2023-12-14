@@ -1,10 +1,10 @@
 package cn.wubo.file.storage.platform.local;
 
-import cn.wubo.file.storage.utils.FileUtils;
 import cn.wubo.file.storage.core.FileInfo;
 import cn.wubo.file.storage.core.MultipartFileStorage;
 import cn.wubo.file.storage.exception.IORuntimeException;
 import cn.wubo.file.storage.platform.base.BaseFileStorage;
+import cn.wubo.file.storage.utils.FileUtils;
 import cn.wubo.file.storage.utils.IoUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Date;
-import java.util.UUID;
 
 /**
  * 本地文件存储升级版

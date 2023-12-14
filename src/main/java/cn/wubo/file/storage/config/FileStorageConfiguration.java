@@ -37,7 +37,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 
 @Configuration
 @EnableConfigurationProperties({FileStorageProperties.class})
@@ -59,7 +58,7 @@ public class FileStorageConfiguration {
      */
     @Bean
     public List<LocalFileStorage> localFileStorageList() {
-        return properties.getLocal().stream().filter(BasePlatform::getEnableStorage).map(LocalFileStorage::new).collect(Collectors.toList());
+        return properties.getLocal().stream().filter(BasePlatform::getEnableStorage).map(LocalFileStorage::new).toList();
     }
 
     /**
@@ -68,7 +67,7 @@ public class FileStorageConfiguration {
     @Bean
     @ConditionalOnClass(name = "software.amazon.awssdk.services.s3.S3Client")
     public List<AmazonS3FileStorage> amazonS3FileStorageList() {
-        return properties.getAmazonS3().stream().filter(BasePlatform::getEnableStorage).map(AmazonS3FileStorage::new).collect(Collectors.toList());
+        return properties.getAmazonS3().stream().filter(BasePlatform::getEnableStorage).map(AmazonS3FileStorage::new).toList();
     }
 
     /**
@@ -77,7 +76,7 @@ public class FileStorageConfiguration {
     @Bean
     @ConditionalOnClass(name = "io.minio.MinioClient")
     public List<MinIOFileStorage> minioFileStorageList() {
-        return properties.getMinIO().stream().filter(BasePlatform::getEnableStorage).map(MinIOFileStorage::new).collect(Collectors.toList());
+        return properties.getMinIO().stream().filter(BasePlatform::getEnableStorage).map(MinIOFileStorage::new).toList();
     }
 
     /**
@@ -86,7 +85,7 @@ public class FileStorageConfiguration {
     @Bean
     @ConditionalOnClass(name = "com.obs.services.ObsClient")
     public List<HuaweiOBSFileStorage> huaweiObsFileStorageList() {
-        return properties.getHuaweiOBS().stream().filter(BasePlatform::getEnableStorage).map(HuaweiOBSFileStorage::new).collect(Collectors.toList());
+        return properties.getHuaweiOBS().stream().filter(BasePlatform::getEnableStorage).map(HuaweiOBSFileStorage::new).toList();
     }
 
     /**
@@ -95,7 +94,7 @@ public class FileStorageConfiguration {
     @Bean
     @ConditionalOnClass(name = "com.baidubce.services.bos.BosClient")
     public List<BaiduBOSFileStorage> baiduBosFileStorageList() {
-        return properties.getBaiduBOS().stream().filter(BasePlatform::getEnableStorage).map(BaiduBOSFileStorage::new).collect(Collectors.toList());
+        return properties.getBaiduBOS().stream().filter(BasePlatform::getEnableStorage).map(BaiduBOSFileStorage::new).toList();
     }
 
     /**
@@ -104,7 +103,7 @@ public class FileStorageConfiguration {
     @Bean
     @ConditionalOnClass(name = "com.aliyun.oss.OSS")
     public List<AliyunOSSFileStorage> aliyunOssFileStorageList() {
-        return properties.getAliyunOSS().stream().filter(BasePlatform::getEnableStorage).map(AliyunOSSFileStorage::new).collect(Collectors.toList());
+        return properties.getAliyunOSS().stream().filter(BasePlatform::getEnableStorage).map(AliyunOSSFileStorage::new).toList();
     }
 
     /**
@@ -113,7 +112,7 @@ public class FileStorageConfiguration {
     @Bean
     @ConditionalOnClass(name = "com.qcloud.cos.COSClient")
     public List<TencentCOSFileStorage> tencentCosFileStorageList() {
-        return properties.getTencentCOS().stream().filter(BasePlatform::getEnableStorage).map(TencentCOSFileStorage::new).collect(Collectors.toList());
+        return properties.getTencentCOS().stream().filter(BasePlatform::getEnableStorage).map(TencentCOSFileStorage::new).toList();
     }
 
     /**
@@ -122,7 +121,7 @@ public class FileStorageConfiguration {
     @Bean
     @ConditionalOnClass(name = "com.github.sardine.Sardine")
     public List<WebDAVFileStorage> webDavFileStorageList() {
-        return properties.getWebDAV().stream().filter(BasePlatform::getEnableStorage).map(WebDAVFileStorage::new).collect(Collectors.toList());
+        return properties.getWebDAV().stream().filter(BasePlatform::getEnableStorage).map(WebDAVFileStorage::new).toList();
     }
 
     /**
@@ -131,36 +130,37 @@ public class FileStorageConfiguration {
     @Bean
     @ConditionalOnClass(name = "org.eclipse.jgit.api.Git")
     public List<GitFileStorage> gitFileStorageList() {
-        return properties.getGit().stream().filter(BasePlatform::getEnableStorage).map(GitFileStorage::new).collect(Collectors.toList());
+        return properties.getGit().stream().filter(BasePlatform::getEnableStorage).map(GitFileStorage::new).toList();
     }
 
     @Bean
     public FileStorageService fileStorageService(List<List<? extends IFileStorage>> fileStorageLists, List<IFileStroageRecord> fileStroageRecordList) {
         IFileStroageRecord fileStroageRecord = fileStroageRecordList.stream().filter(obj -> obj.getClass().getName().equals(properties.getFileStorageRecord())).findAny().orElseThrow(() -> new FileStorageRuntimeException(String.format("未找到%s对应的bean，无法加载IFileStroageRecord！", properties.getFileStorageRecord())));
         fileStroageRecord.init();
-        return new FileStorageService(new CopyOnWriteArrayList<>(fileStorageLists.stream().flatMap(Collection::stream).collect(Collectors.toList())), fileStroageRecord);
+        return new FileStorageService(new CopyOnWriteArrayList<>(fileStorageLists.stream().flatMap(Collection::stream).toList()), fileStroageRecord);
     }
 
-    @Bean("wb04307201_file_storage_router")
-    public RouterFunction<ServerResponse> fileStorageRouter(FileStorageService fileStorageService) {
-        BiFunction<ServerRequest, FileStorageService, ServerResponse> listFunction = (request, service) -> {
-            String contextPath = request.requestPath().contextPath().value();
-            Map<String, Object> data = new HashMap<>();
-            FileInfo fileInfo = new FileInfo();
-            if (HttpMethod.POST.equals(request.method())) {
-                MultiValueMap<String, String> params = request.params();
-                fileInfo.setPlatform(params.getFirst("platform"));
-                fileInfo.setAlias(params.getFirst("alias"));
-                fileInfo.setOriginalFilename(params.getFirst("originalFilename"));
-            }
-            data.put("list", service.list(fileInfo));
-            data.put("contextPath", contextPath);
-            fileInfo.setAlias(HtmlUtils.htmlEscape(fileInfo.getAlias() == null ? "" : fileInfo.getAlias()));
-            fileInfo.setOriginalFilename(HtmlUtils.htmlEscape(fileInfo.getOriginalFilename() == null ? "" : fileInfo.getOriginalFilename()));
-            data.put("query", fileInfo);
-            return ServerResponse.ok().contentType(MediaType.TEXT_HTML).body(PageUtils.write("list.ftl", data));
-        };
 
+    private final BiFunction<ServerRequest, FileStorageService, ServerResponse> listFunction = (request, service) -> {
+        String contextPath = request.requestPath().contextPath().value();
+        Map<String, Object> data = new HashMap<>();
+        FileInfo fileInfo = new FileInfo();
+        if (HttpMethod.POST.equals(request.method())) {
+            MultiValueMap<String, String> params = request.params();
+            fileInfo.setPlatform(params.getFirst("platform"));
+            fileInfo.setAlias(params.getFirst("alias"));
+            fileInfo.setOriginalFilename(params.getFirst("originalFilename"));
+        }
+        data.put("list", service.list(fileInfo));
+        data.put("contextPath", contextPath);
+        fileInfo.setAlias(HtmlUtils.htmlEscape(fileInfo.getAlias() == null ? "" : fileInfo.getAlias()));
+        fileInfo.setOriginalFilename(HtmlUtils.htmlEscape(fileInfo.getOriginalFilename() == null ? "" : fileInfo.getOriginalFilename()));
+        data.put("query", fileInfo);
+        return ServerResponse.ok().contentType(MediaType.TEXT_HTML).body(PageUtils.write("list.ftl", data));
+    };
+
+    @Bean("wb04307201FileStorageRouter")
+    public RouterFunction<ServerResponse> fileStorageRouter(FileStorageService fileStorageService) {
         return RouterFunctions.route().GET("/file/storage/list", RequestPredicates.accept(MediaType.TEXT_HTML), request -> listFunction.apply(request, fileStorageService)).POST("/file/storage/list", RequestPredicates.accept(MediaType.APPLICATION_FORM_URLENCODED), request -> listFunction.apply(request, fileStorageService)).GET("/file/storage/delete", RequestPredicates.accept(MediaType.TEXT_HTML), request -> {
             Optional<String> optionalId = request.param("id");
             if (optionalId.isPresent()) fileStorageService.delete(optionalId.get());

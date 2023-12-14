@@ -12,6 +12,9 @@ import java.nio.file.Files;
 @Slf4j
 public class IoUtils {
 
+    private IoUtils() {
+    }
+
     /**
      * 默认缓存大小 8192
      */

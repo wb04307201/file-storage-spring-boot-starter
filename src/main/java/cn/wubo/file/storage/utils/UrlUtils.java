@@ -5,6 +5,9 @@ import java.util.Arrays;
 public class UrlUtils {
 
 
+    private UrlUtils() {
+    }
+
     /**
      * 获取父路径
      */

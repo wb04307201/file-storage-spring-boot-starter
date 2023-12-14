@@ -4,7 +4,7 @@
 
 > 一个适配多平台文件存储的中间件  
 > 可通过简单的配置既可集成到springboot中  
-> 将文件存储到本地、AmazonS3、MinIO、华为云OBS、百度云 BOS、阿里云OSS、腾讯云COS、WebDAV、Git等平台 
+> 将文件存储到本地、AmazonS3、MinIO、华为云OBS、百度云 BOS、阿里云OSS、腾讯云COS、WebDAV、Git等平台
 
 ## 代码示例
 1. 使用[多平台文件存储](https://gitee.com/wb04307201/file-storage-spring-boot-starter)、[实体SQL工具类](https://gitee.com/wb04307201/sql-util)实现的[文件存储Demo](https://gitee.com/wb04307201/file-storage-demo)
@@ -22,12 +22,12 @@
 ```
 
 ## 第二步 引入jar
-
+1.1.0版本后升级到jdk 17 SpringBoot 3.2.0
 ```xml
 <dependency>
     <groupId>com.gitee.wb04307201</groupId>
     <artifactId>file-storage-spring-boot-starter</artifactId>
-    <version>1.0.12</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 
