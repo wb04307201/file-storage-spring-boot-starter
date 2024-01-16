@@ -387,7 +387,7 @@ docker exec -it alist ./alist admin
 ```yaml
 file:
   storage:
-    fileNameMapping: cn.wubo.file.storage.demo
+    fileNameMapping: cn.wubo.file.storage.demo.MD5FileNameMappingImpl
 ```
 
 ```java
