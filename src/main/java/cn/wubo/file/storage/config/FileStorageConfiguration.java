@@ -5,6 +5,8 @@ import cn.wubo.file.storage.core.FileInfo;
 import cn.wubo.file.storage.core.FileStorageService;
 import cn.wubo.file.storage.core.MultipartFileStorage;
 import cn.wubo.file.storage.exception.FileStorageRuntimeException;
+import cn.wubo.file.storage.file_name_mapping.IFileNameMapping;
+import cn.wubo.file.storage.file_name_mapping.impl.RandomFileNameMappingImpl;
 import cn.wubo.file.storage.platform.IFileStorage;
 import cn.wubo.file.storage.platform.aliyunOSS.AliyunOSSFileStorage;
 import cn.wubo.file.storage.platform.amazonS3.AmazonS3FileStorage;
@@ -51,6 +53,11 @@ public class FileStorageConfiguration {
     @Bean
     public IFileStroageRecord fileStroageRecord() {
         return new MemFileStroageRecordImpl();
+    }
+
+    @Bean
+    public IFileNameMapping fileNameMapping() {
+        return new RandomFileNameMappingImpl();
     }
 
     /**
@@ -134,12 +141,12 @@ public class FileStorageConfiguration {
     }
 
     @Bean
-    public FileStorageService fileStorageService(List<List<? extends IFileStorage>> fileStorageLists, List<IFileStroageRecord> fileStroageRecordList) {
+    public FileStorageService fileStorageService(List<List<? extends IFileStorage>> fileStorageLists, List<IFileStroageRecord> fileStroageRecordList, List<IFileNameMapping> fileNameMappingList) {
         IFileStroageRecord fileStroageRecord = fileStroageRecordList.stream().filter(obj -> obj.getClass().getName().equals(properties.getFileStorageRecord())).findAny().orElseThrow(() -> new FileStorageRuntimeException(String.format("未找到%s对应的bean，无法加载IFileStroageRecord！", properties.getFileStorageRecord())));
         fileStroageRecord.init();
-        return new FileStorageService(new CopyOnWriteArrayList<>(fileStorageLists.stream().flatMap(Collection::stream).toList()), fileStroageRecord);
+        IFileNameMapping fileNameMapping = fileNameMappingList.stream().filter(obj -> obj.getClass().getName().equals(properties.getFileNameMapping())).findAny().orElseThrow(() -> new FileStorageRuntimeException(String.format("未找到%s对应的bean，无法加载IFileNameMapping！", properties.getFileNameMapping())));
+        return new FileStorageService(new CopyOnWriteArrayList<>(fileStorageLists.stream().flatMap(Collection::stream).toList()), fileStroageRecord, fileNameMapping);
     }
-
 
     private final BiFunction<ServerRequest, FileStorageService, ServerResponse> listFunction = (request, service) -> {
         String contextPath = request.requestPath().contextPath().value();

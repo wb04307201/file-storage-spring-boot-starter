@@ -4,7 +4,6 @@ import cn.wubo.file.storage.core.FileInfo;
 import cn.wubo.file.storage.core.MultipartFileStorage;
 import cn.wubo.file.storage.exception.FileStorageRuntimeException;
 import cn.wubo.file.storage.platform.base.BaseFileStorage;
-import cn.wubo.file.storage.utils.FileUtils;
 import cn.wubo.file.storage.utils.UrlUtils;
 import io.minio.*;
 import io.minio.errors.*;
@@ -43,13 +42,10 @@ public class MinIOFileStorage extends BaseFileStorage {
 
     @Override
     public FileInfo save(MultipartFileStorage fileWrapper) {
-        String fileName = FileUtils.getRandomFileName(fileWrapper.getOriginalFilename());
-        String filePath = UrlUtils.join(basePath, fileWrapper.getPath(), fileName);
+        String filePath = UrlUtils.join(basePath, fileWrapper.getPath(), fileWrapper.getName());
 
         try (InputStream is = fileWrapper.getInputStream()) {
-            getClient().putObject(PutObjectArgs.builder().bucket(bucketName).object(filePath)
-                    .stream(is, fileWrapper.getSize(), -1)
-                    .contentType(fileWrapper.getContentType()).build());
+            getClient().putObject(PutObjectArgs.builder().bucket(bucketName).object(filePath).stream(is, fileWrapper.getSize(), -1).contentType(fileWrapper.getContentType()).build());
         } catch (IOException | ErrorResponseException | InsufficientDataException | InternalException |
                  InvalidKeyException | InvalidResponseException | NoSuchAlgorithmException | ServerException |
                  XmlParserException e) {
@@ -61,19 +57,14 @@ public class MinIOFileStorage extends BaseFileStorage {
             throw new FileStorageRuntimeException(String.format("存储文件失败,%s", e.getMessage()), e);
         }
 
-        return new FileInfo(fileName, basePath, new Date(), fileWrapper, platform);
+        return new FileInfo(fileWrapper.getName(), basePath, new Date(), fileWrapper, platform);
     }
 
     @Override
     public boolean delete(FileInfo fileInfo) {
         if (exists(fileInfo)) {
             try {
-                getClient().removeObject(
-                        RemoveObjectArgs.builder()
-                                .bucket(bucketName).
-                                object(getUrlPath(fileInfo))
-                                .build()
-                );
+                getClient().removeObject(RemoveObjectArgs.builder().bucket(bucketName).object(getUrlPath(fileInfo)).build());
             } catch (ErrorResponseException | InsufficientDataException | InvalidKeyException | InternalException |
                      InvalidResponseException | XmlParserException | ServerException | NoSuchAlgorithmException |
                      IOException e) {
@@ -86,12 +77,7 @@ public class MinIOFileStorage extends BaseFileStorage {
     @Override
     public boolean exists(FileInfo fileInfo) {
         try {
-            StatObjectResponse stat = getClient().statObject(
-                    StatObjectArgs.builder()
-                            .bucket(bucketName).
-                            object(getUrlPath(fileInfo))
-                            .build()
-            );
+            StatObjectResponse stat = getClient().statObject(StatObjectArgs.builder().bucket(bucketName).object(getUrlPath(fileInfo)).build());
             return stat != null && stat.lastModified() != null;
         } catch (ErrorResponseException | InsufficientDataException | InvalidKeyException | InternalException |
                  InvalidResponseException | XmlParserException | ServerException | NoSuchAlgorithmException |
@@ -103,7 +89,7 @@ public class MinIOFileStorage extends BaseFileStorage {
     @Override
     public MultipartFileStorage download(FileInfo fileInfo) {
         try (InputStream is = getClient().getObject(GetObjectArgs.builder().bucket(bucketName).object(getUrlPath(fileInfo)).build())) {
-            return new MultipartFileStorage(fileInfo.getOriginalFilename(), is);
+            return new MultipartFileStorage(fileInfo.getFilename(), fileInfo.getOriginalFilename(), fileInfo.getContentType(), is);
         } catch (ErrorResponseException | InsufficientDataException | InvalidKeyException | InternalException |
                  InvalidResponseException | XmlParserException | ServerException | NoSuchAlgorithmException |
                  IOException e) {

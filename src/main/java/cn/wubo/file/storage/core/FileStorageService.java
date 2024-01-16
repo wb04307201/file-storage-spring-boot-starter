@@ -1,6 +1,7 @@
 package cn.wubo.file.storage.core;
 
 import cn.wubo.file.storage.exception.FileStorageRuntimeException;
+import cn.wubo.file.storage.file_name_mapping.IFileNameMapping;
 import cn.wubo.file.storage.platform.IFileStorage;
 import cn.wubo.file.storage.record.IFileStroageRecord;
 import lombok.Getter;
@@ -19,9 +20,12 @@ public class FileStorageService implements DisposableBean {
     @Getter
     IFileStroageRecord fileStroageRecord;
 
-    public FileStorageService(List<IFileStorage> fileStorageList, IFileStroageRecord fileStroageRecord) {
+    IFileNameMapping fileNameMapping;
+
+    public FileStorageService(List<IFileStorage> fileStorageList, IFileStroageRecord fileStroageRecord, IFileNameMapping fileNameMapping) {
         this.fileStorageList = new CopyOnWriteArrayList<>(fileStorageList);
         this.fileStroageRecord = fileStroageRecord;
+        this.fileNameMapping = fileNameMapping;
     }
 
     private IFileStorage getFileStorage(String alias) {
@@ -36,6 +40,7 @@ public class FileStorageService implements DisposableBean {
     }
 
     public FileInfo save(MultipartFileStorage fileWrapper) {
+        fileWrapper.setName(fileNameMapping.mapping(fileWrapper.getOriginalFilename()));
         FileInfo fileInfo = getFileStorage(fileWrapper.getAlias()).save(fileWrapper);
         return fileStroageRecord.save(fileInfo);
     }

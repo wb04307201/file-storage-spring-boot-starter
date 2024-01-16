@@ -1,9 +1,8 @@
 package cn.wubo.file.storage.platform.webDAV;
 
-import cn.wubo.file.storage.exception.FileStorageRuntimeException;
-import cn.wubo.file.storage.utils.FileUtils;
 import cn.wubo.file.storage.core.FileInfo;
 import cn.wubo.file.storage.core.MultipartFileStorage;
+import cn.wubo.file.storage.exception.FileStorageRuntimeException;
 import cn.wubo.file.storage.platform.base.BaseFileStorage;
 import cn.wubo.file.storage.utils.UrlUtils;
 import com.github.sardine.Sardine;
@@ -47,9 +46,8 @@ public class WebDAVFileStorage extends BaseFileStorage {
 
     @Override
     public FileInfo save(MultipartFileStorage fileWrapper) {
-        String fileName = FileUtils.getRandomFileName(fileWrapper.getOriginalFilename());
         String fileDir = UrlUtils.join(server, storagePath, basePath, fileWrapper.getPath());
-        String filePath = UrlUtils.join(server, storagePath, basePath, fileWrapper.getPath(), fileName);
+        String filePath = UrlUtils.join(server, storagePath, basePath, fileWrapper.getPath(), fileWrapper.getName());
 
         try {
             createDirectory(fileDir);
@@ -63,7 +61,7 @@ public class WebDAVFileStorage extends BaseFileStorage {
             throw new FileStorageRuntimeException(String.format("存储文件失败,%s", e.getMessage()), e);
         }
 
-        return new FileInfo(fileName, basePath, new Date(), fileWrapper, platform);
+        return new FileInfo(fileWrapper.getName(), basePath, new Date(), fileWrapper, platform);
     }
 
     @Override
@@ -90,7 +88,7 @@ public class WebDAVFileStorage extends BaseFileStorage {
     @Override
     public MultipartFileStorage download(FileInfo fileInfo) {
         try (InputStream is = getClient().get(UrlUtils.join(server, storagePath, getUrlPath(fileInfo)))) {
-            return new MultipartFileStorage(fileInfo.getOriginalFilename(), is);
+            return new MultipartFileStorage(fileInfo.getFilename(), fileInfo.getOriginalFilename(), fileInfo.getContentType(), is);
         } catch (IOException e) {
             throw new FileStorageRuntimeException(String.format("下载文件失败,%s", e.getMessage()), e);
         }

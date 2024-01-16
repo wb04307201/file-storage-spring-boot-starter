@@ -1,8 +1,8 @@
 package cn.wubo.file.storage.core;
 
+import cn.wubo.file.storage.exception.IORuntimeException;
 import cn.wubo.file.storage.utils.FileUtils;
 import cn.wubo.file.storage.utils.IoUtils;
-import cn.wubo.file.storage.exception.IORuntimeException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,17 +49,14 @@ public class MultipartFileStorage implements MultipartFile {
         this(file.getName(), null, null, IoUtils.readBytes(file));
     }
 
-    public MultipartFileStorage(String name, byte[] bytes) {
-        this(name, null, null, bytes);
+    public MultipartFileStorage(String name, String originalFilename, String contentType, InputStream is) {
+        this(name, originalFilename, contentType, IoUtils.readBytes(is));
     }
 
-    public MultipartFileStorage(String name, InputStream is) {
-        this(name, null, null, IoUtils.readBytes(is));
-    }
 
     public MultipartFileStorage(String name, String originalFilename, String contentType, byte[] bytes) {
-        this.name = (name != null ? name : "");
-        this.originalFilename = (originalFilename != null ? originalFilename : this.name);
+        this.name = name != null ? name : "";
+        this.originalFilename = originalFilename != null ? originalFilename : this.name;
         if (contentType == null) {
             try {
                 contentType = FileUtils.getMimeType(this.originalFilename);

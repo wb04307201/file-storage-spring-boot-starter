@@ -3,7 +3,6 @@ package cn.wubo.file.storage.platform.amazonS3;
 import cn.wubo.file.storage.core.FileInfo;
 import cn.wubo.file.storage.core.MultipartFileStorage;
 import cn.wubo.file.storage.platform.base.BaseFileStorage;
-import cn.wubo.file.storage.utils.FileUtils;
 import cn.wubo.file.storage.utils.UrlUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
@@ -53,12 +52,11 @@ public class AmazonS3FileStorage extends BaseFileStorage {
 
     @Override
     public FileInfo save(MultipartFileStorage fileWrapper) {
-        String fileName = FileUtils.getRandomFileName(fileWrapper.getOriginalFilename());
-        String filePath = UrlUtils.join(basePath, fileWrapper.getPath(), fileName);
+        String filePath = UrlUtils.join(basePath, fileWrapper.getPath(), fileWrapper.getName());
         PutObjectRequest putObjectRequest = PutObjectRequest.builder().bucket(bucketName).key(filePath).contentType(fileWrapper.getContentType()).build();
         RequestBody requestBody = RequestBody.fromBytes(fileWrapper.getBytes());
         getClient().putObject(putObjectRequest, requestBody);
-        return new FileInfo(fileName, basePath, new Date(), fileWrapper, platform);
+        return new FileInfo(fileWrapper.getName(), basePath, new Date(), fileWrapper, platform);
     }
 
     @Override
@@ -81,7 +79,7 @@ public class AmazonS3FileStorage extends BaseFileStorage {
     public MultipartFileStorage download(FileInfo fileInfo) {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder().bucket(bucketName).key(getUrlPath(fileInfo)).build();
         ResponseInputStream<GetObjectResponse> responseResponseInputStream = getClient().getObject(getObjectRequest);
-        return new MultipartFileStorage(fileInfo.getOriginalFilename(), responseResponseInputStream);
+        return new MultipartFileStorage(fileInfo.getFilename(), fileInfo.getOriginalFilename(), fileInfo.getContentType(), responseResponseInputStream);
     }
 
     @Override

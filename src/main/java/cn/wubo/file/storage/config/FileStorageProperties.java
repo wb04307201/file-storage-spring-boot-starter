@@ -20,6 +20,7 @@ import java.util.List;
 @ConfigurationProperties(prefix = "file.storage")
 public class FileStorageProperties {
     private String fileStorageRecord = "cn.wubo.file.storage.record.impl.MemFileStroageRecordImpl";
+    private String fileNameMapping = "cn.wubo.file.storage.file_name_mapping.impl.RandomFileNameMappingImpl";
     private List<Local> local = new ArrayList<>();
     private List<AmazonS3> amazonS3 = new ArrayList<>();
     private List<MinIO> minIO = new ArrayList<>();
@@ -29,5 +30,4 @@ public class FileStorageProperties {
     private List<TencentCOS> tencentCOS = new ArrayList<>();
     private List<WebDAV> webDAV = new ArrayList<>();
     private List<Git> git = new ArrayList<>();
-
 }

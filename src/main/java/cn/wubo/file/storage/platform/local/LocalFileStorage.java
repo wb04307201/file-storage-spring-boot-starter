@@ -4,7 +4,6 @@ import cn.wubo.file.storage.core.FileInfo;
 import cn.wubo.file.storage.core.MultipartFileStorage;
 import cn.wubo.file.storage.exception.IORuntimeException;
 import cn.wubo.file.storage.platform.base.BaseFileStorage;
-import cn.wubo.file.storage.utils.FileUtils;
 import cn.wubo.file.storage.utils.IoUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,10 +27,9 @@ public class LocalFileStorage extends BaseFileStorage {
 
     @Override
     public FileInfo save(MultipartFileStorage fileWrapper) {
-        String fileName = FileUtils.getRandomFileName(fileWrapper.getOriginalFilename());
-        String filePath = Paths.get(basePath, fileWrapper.getPath(), fileName).toString();
+        String filePath = Paths.get(basePath, fileWrapper.getPath(), fileWrapper.getName()).toString();
         fileWrapper.transferTo(Paths.get(this.storagePath, filePath).toFile());
-        return new FileInfo(fileName, basePath, new Date(), fileWrapper, platform);
+        return new FileInfo(fileWrapper.getName(), basePath, new Date(), fileWrapper, platform);
     }
 
     @Override
@@ -39,11 +37,11 @@ public class LocalFileStorage extends BaseFileStorage {
         if (exists(fileInfo)) {
             try {
                 Files.delete(Paths.get(this.storagePath, getFilePath(fileInfo)));
-                return true;
             } catch (IOException e) {
                 throw new IORuntimeException(e.getMessage(), e);
             }
-        } else return true;
+        }
+        return true;
     }
 
     @Override
@@ -53,7 +51,7 @@ public class LocalFileStorage extends BaseFileStorage {
 
     @Override
     public MultipartFileStorage download(FileInfo fileInfo) {
-        return new MultipartFileStorage(fileInfo.getOriginalFilename(), IoUtils.readBytes(Paths.get(this.storagePath, getFilePath(fileInfo)).toFile()));
+        return new MultipartFileStorage(fileInfo.getFilename(), fileInfo.getOriginalFilename(), fileInfo.getContentType(), IoUtils.readBytes(Paths.get(this.storagePath, getFilePath(fileInfo)).toFile()));
     }
 
     @Override

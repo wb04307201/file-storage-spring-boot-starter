@@ -4,7 +4,6 @@ import cn.wubo.file.storage.core.FileInfo;
 import cn.wubo.file.storage.core.MultipartFileStorage;
 import cn.wubo.file.storage.exception.FileStorageRuntimeException;
 import cn.wubo.file.storage.platform.base.BaseFileStorage;
-import cn.wubo.file.storage.utils.FileUtils;
 import cn.wubo.file.storage.utils.UrlUtils;
 import com.baidubce.Protocol;
 import com.baidubce.auth.DefaultBceCredentials;
@@ -46,8 +45,7 @@ public class BaiduBOSFileStorage extends BaseFileStorage {
 
     @Override
     public FileInfo save(MultipartFileStorage fileWrapper) {
-        String fileName = FileUtils.getRandomFileName(fileWrapper.getOriginalFilename());
-        String filePath = UrlUtils.join(basePath, fileWrapper.getPath(), fileName);
+        String filePath = UrlUtils.join(basePath, fileWrapper.getPath(), fileWrapper.getName());
 
         try (InputStream is = fileWrapper.getInputStream()) {
             ObjectMetadata metadata = new ObjectMetadata();
@@ -59,7 +57,7 @@ public class BaiduBOSFileStorage extends BaseFileStorage {
             throw new FileStorageRuntimeException(String.format("存储文件失败,%s", e.getMessage()), e);
         }
 
-        return new FileInfo(fileName, basePath, new Date(), fileWrapper, platform);
+        return new FileInfo(fileWrapper.getName(), basePath, new Date(), fileWrapper, platform);
     }
 
     @Override
@@ -77,7 +75,7 @@ public class BaiduBOSFileStorage extends BaseFileStorage {
     public MultipartFileStorage download(FileInfo fileInfo) {
         BosObject object = getClient().getObject(bucketName, getUrlPath(fileInfo));
         try (InputStream is = object.getObjectContent()) {
-            return new MultipartFileStorage(fileInfo.getOriginalFilename(), is);
+            return new MultipartFileStorage(fileInfo.getFilename(), fileInfo.getOriginalFilename(), fileInfo.getContentType(), is);
         } catch (IOException e) {
             throw new FileStorageRuntimeException(String.format("下载文件失败,%s", e.getMessage()), e);
         }
