@@ -22,6 +22,8 @@
                 <option value="" <#if ((query.platform)!'') == ''>selected</#if>>All</option>
                 <option value="Local" <#if ((query.platform)!'') == 'Local'>selected</#if>>本地
                 </option>
+                <option value="AmazonS3" <#if ((query.platform)!'') == 'AmazonS3'>selected</#if>>AmazonS3
+                </option>
                 <option value="MinIO" <#if ((query.platform)!'') == 'MinIO'>selected</#if>>MinIO
                 </option>
                 <option value="HuaweiOBS" <#if ((query.platform)!'') == 'HuaweiOBS'>selected</#if>>HuaweiOBS</option>
