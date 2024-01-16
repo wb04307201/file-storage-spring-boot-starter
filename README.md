@@ -28,7 +28,7 @@
 <dependency>
     <groupId>com.gitee.wb04307201</groupId>
     <artifactId>file-storage-spring-boot-starter</artifactId>
-    <version>1.1.1</version>
+    <version>1.1.2</version>
 </dependency>
 ```
 
@@ -381,6 +381,34 @@ docker run -p 9000:9000 -p 9090:9090 --name minio -v D:\minio\data:/data -e "MIN
 docker run -d --restart=always -v /etc/alist:/opt/alist/data -p 5244:5244 -e PUID=0 -e PGID=0 -e UMASK=022 --name="alist" xhofe/alist:latest
 # 查看用户名和密码
 docker exec -it alist ./alist admin
+```
+
+## 其他5：自定义存储文件命名方法
+```yaml
+file:
+  storage:
+    fileNameMapping: cn.wubo.file.storage.demo
+```
+
+```java
+@Component
+public class MD5FileNameMappingImpl implements IFileNameMapping {
+    @Override
+    public String mapping(String s) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("MD5");
+            byte[] hashedBytes = digest.digest(s.getBytes());
+
+            StringBuilder sb = new StringBuilder();
+            for (byte b : hashedBytes) {
+                sb.append(Integer.toString((b & 0xff) + 0x100, 16).substring(1));
+            }
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
 ```
 
 ## 待办
