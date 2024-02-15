@@ -262,98 +262,45 @@ public class PageController {
 @Component
 public class H2FileStroageRecordImpl implements IFileStroageRecord {
 
-    private static final String HISTORY = "file_storage_history";
-
-    private static ConnectionPool connectionPool = new ConnectionPool(new ConnectionParam());
+    static {
+        MutilConnectionPool.init("main", "jdbc:h2:file:./data/demo;AUTO_SERVER=TRUE", "sa", "");
+    }
 
     @Override
     public FileInfo save(FileInfo fileInfo) {
-        try {
-            Connection conn = connectionPool.getConnection();
-            if (!StringUtils.hasLength(fileInfo.getId())) {
-                fileInfo.setId(UUID.randomUUID().toString());
-                ExecuteSqlUtils.executeUpdate(conn, ModelSqlUtils.insertSql(HISTORY, fileInfo), new HashMap<>());
-            } else {
-                ExecuteSqlUtils.executeUpdate(conn, ModelSqlUtils.updateByIdSql(HISTORY, fileInfo), new HashMap<>());
-            }
-            connectionPool.returnConnection(conn);
-        } catch (SQLException | InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        return fileInfo;
+        FileStorageRecord fileStorageRecord = FileStorageRecord.trans(fileInfo);
+        if (!StringUtils.hasLength(fileStorageRecord.getId())) {
+            fileStorageRecord.setId(UUID.randomUUID().toString());
+            MutilConnectionPool.run("main", conn -> ModelSqlUtils.insertSql(fileStorageRecord).executeUpdate(conn));
+        } else MutilConnectionPool.run("main", conn -> ModelSqlUtils.updateSql(fileStorageRecord).executeUpdate(conn));
+        return fileStorageRecord.getFileInfo();
     }
 
     @Override
     public List<FileInfo> list(FileInfo fileInfo) {
-        try {
-            Connection conn = connectionPool.getConnection();
-            String sql = ModelSqlUtils.selectSql(HISTORY, new FileInfo());
-
-            List<String> condition = new ArrayList<>();
-            if (StringUtils.hasLength(fileInfo.getId())) condition.add(" id = '" + fileInfo.getId() + "'");
-            if (StringUtils.hasLength(fileInfo.getPlatform()))
-                condition.add(" platform = '" + fileInfo.getPlatform() + "'");
-            if (StringUtils.hasLength(fileInfo.getAlias()))
-                condition.add(" alias like '%" + fileInfo.getAlias() + "%'");
-            if (StringUtils.hasLength(fileInfo.getOriginalFilename()))
-                condition.add(" originalFilename like '%" + fileInfo.getOriginalFilename() + "%'");
-
-            if (!condition.isEmpty()) sql = sql + " where " + String.join("and", condition);
-
-            List<FileInfo> res = ExecuteSqlUtils.executeQuery(conn, sql, new HashMap<>(), FileInfo.class);
-            connectionPool.returnConnection(conn);
-            return res;
-        } catch (SQLException | InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        FileStorageRecord fileStorageRecord = FileStorageRecord.trans(fileInfo);
+        return MutilConnectionPool.run("main", conn -> ModelSqlUtils.selectSql(fileStorageRecord).executeQuery(conn)).stream().map(FileStorageRecord::getFileInfo).collect(Collectors.toList());
     }
 
     @Override
     public FileInfo findById(String s) {
-        FileInfo fileInfo = new FileInfo();
-        fileInfo.setId(s);
-        String sql = ModelSqlUtils.selectSql(HISTORY, fileInfo);
-        try {
-            Connection conn = connectionPool.getConnection();
-            List<FileInfo> res = ExecuteSqlUtils.executeQuery(conn, sql, new HashMap<>(), FileInfo.class);
-            connectionPool.returnConnection(conn);
-            return res.get(0);
-        } catch (SQLException | InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        FileInfo query = new FileInfo();
+        query.setId(s);
+        List<FileInfo> list = list(query);
+        return list.isEmpty() ? null : list.get(0);
     }
 
     @Override
     public Boolean delete(FileInfo fileInfo) {
-        List<FileInfo> fileInfos = list(fileInfo);
-        try {
-            Connection conn = connectionPool.getConnection();
-            conn.setAutoCommit(false);
-            AtomicInteger count = new AtomicInteger();
-            fileInfos.stream().forEach(e -> {
-                FileInfo delete = new FileInfo();
-                delete.setId(e.getId());
-                String sql = ModelSqlUtils.deleteByIdSql(HISTORY, delete);
-                count.addAndGet(ExecuteSqlUtils.executeUpdate(conn, sql, new HashMap<>()));
-            });
-            conn.commit();
-            connectionPool.returnConnection(conn);
-            return count.get() > 0;
-        } catch (SQLException | InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        FileStorageRecord fileStorageRecord = FileStorageRecord.trans(fileInfo);
+        return MutilConnectionPool.run("main", conn -> ModelSqlUtils.deleteSql(fileStorageRecord).executeUpdate(conn)) > 0;
     }
 
     @Override
     public void init() {
-        try {
-            Connection conn = connectionPool.getConnection();
-            if (!ExecuteSqlUtils.isTableExists(conn, HISTORY, DbType.h2)) {
-                ExecuteSqlUtils.executeUpdate(conn, ModelSqlUtils.createSql(HISTORY, new FileInfo()), new HashMap<>());
-            }
-        } catch (SQLException | InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        if (Boolean.FALSE.equals(MutilConnectionPool.run("main", conn -> new SQL<FileStorageRecord>() {
+        }.isTableExists(conn)))) MutilConnectionPool.run("main", conn -> new SQL<FileStorageRecord>() {
+        }.create().parse().createTable(conn));
     }
 }
 ```
