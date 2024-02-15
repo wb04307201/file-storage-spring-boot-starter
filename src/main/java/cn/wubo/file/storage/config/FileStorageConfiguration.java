@@ -39,6 +39,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 @Configuration
 @EnableConfigurationProperties({FileStorageProperties.class})
@@ -65,7 +66,7 @@ public class FileStorageConfiguration {
      */
     @Bean
     public List<LocalFileStorage> localFileStorageList() {
-        return properties.getLocal().stream().filter(BasePlatform::getEnableStorage).map(LocalFileStorage::new).toList();
+        return properties.getLocal().stream().filter(BasePlatform::getEnableStorage).map(LocalFileStorage::new).collect(Collectors.toList());
     }
 
     /**
@@ -74,7 +75,7 @@ public class FileStorageConfiguration {
     @Bean
     @ConditionalOnClass(name = "software.amazon.awssdk.services.s3.S3Client")
     public List<AmazonS3FileStorage> amazonS3FileStorageList() {
-        return properties.getAmazonS3().stream().filter(BasePlatform::getEnableStorage).map(AmazonS3FileStorage::new).toList();
+        return properties.getAmazonS3().stream().filter(BasePlatform::getEnableStorage).map(AmazonS3FileStorage::new).collect(Collectors.toList());
     }
 
     /**
@@ -83,7 +84,7 @@ public class FileStorageConfiguration {
     @Bean
     @ConditionalOnClass(name = "io.minio.MinioClient")
     public List<MinIOFileStorage> minioFileStorageList() {
-        return properties.getMinIO().stream().filter(BasePlatform::getEnableStorage).map(MinIOFileStorage::new).toList();
+        return properties.getMinIO().stream().filter(BasePlatform::getEnableStorage).map(MinIOFileStorage::new).collect(Collectors.toList());
     }
 
     /**
@@ -92,7 +93,7 @@ public class FileStorageConfiguration {
     @Bean
     @ConditionalOnClass(name = "com.obs.services.ObsClient")
     public List<HuaweiOBSFileStorage> huaweiObsFileStorageList() {
-        return properties.getHuaweiOBS().stream().filter(BasePlatform::getEnableStorage).map(HuaweiOBSFileStorage::new).toList();
+        return properties.getHuaweiOBS().stream().filter(BasePlatform::getEnableStorage).map(HuaweiOBSFileStorage::new).collect(Collectors.toList());
     }
 
     /**
@@ -101,7 +102,7 @@ public class FileStorageConfiguration {
     @Bean
     @ConditionalOnClass(name = "com.baidubce.services.bos.BosClient")
     public List<BaiduBOSFileStorage> baiduBosFileStorageList() {
-        return properties.getBaiduBOS().stream().filter(BasePlatform::getEnableStorage).map(BaiduBOSFileStorage::new).toList();
+        return properties.getBaiduBOS().stream().filter(BasePlatform::getEnableStorage).map(BaiduBOSFileStorage::new).collect(Collectors.toList());
     }
 
     /**
@@ -110,7 +111,7 @@ public class FileStorageConfiguration {
     @Bean
     @ConditionalOnClass(name = "com.aliyun.oss.OSS")
     public List<AliyunOSSFileStorage> aliyunOssFileStorageList() {
-        return properties.getAliyunOSS().stream().filter(BasePlatform::getEnableStorage).map(AliyunOSSFileStorage::new).toList();
+        return properties.getAliyunOSS().stream().filter(BasePlatform::getEnableStorage).map(AliyunOSSFileStorage::new).collect(Collectors.toList());
     }
 
     /**
@@ -119,7 +120,7 @@ public class FileStorageConfiguration {
     @Bean
     @ConditionalOnClass(name = "com.qcloud.cos.COSClient")
     public List<TencentCOSFileStorage> tencentCosFileStorageList() {
-        return properties.getTencentCOS().stream().filter(BasePlatform::getEnableStorage).map(TencentCOSFileStorage::new).toList();
+        return properties.getTencentCOS().stream().filter(BasePlatform::getEnableStorage).map(TencentCOSFileStorage::new).collect(Collectors.toList());
     }
 
     /**
@@ -128,7 +129,7 @@ public class FileStorageConfiguration {
     @Bean
     @ConditionalOnClass(name = "com.github.sardine.Sardine")
     public List<WebDAVFileStorage> webDavFileStorageList() {
-        return properties.getWebDAV().stream().filter(BasePlatform::getEnableStorage).map(WebDAVFileStorage::new).toList();
+        return properties.getWebDAV().stream().filter(BasePlatform::getEnableStorage).map(WebDAVFileStorage::new).collect(Collectors.toList());
     }
 
     /**
@@ -137,7 +138,7 @@ public class FileStorageConfiguration {
     @Bean
     @ConditionalOnClass(name = "org.eclipse.jgit.api.Git")
     public List<GitFileStorage> gitFileStorageList() {
-        return properties.getGit().stream().filter(BasePlatform::getEnableStorage).map(GitFileStorage::new).toList();
+        return properties.getGit().stream().filter(BasePlatform::getEnableStorage).map(GitFileStorage::new).collect(Collectors.toList());
     }
 
     @Bean
@@ -145,7 +146,7 @@ public class FileStorageConfiguration {
         IFileStroageRecord fileStroageRecord = fileStroageRecordList.stream().filter(obj -> obj.getClass().getName().equals(properties.getFileStorageRecord())).findAny().orElseThrow(() -> new FileStorageRuntimeException(String.format("未找到%s对应的bean，无法加载IFileStroageRecord！", properties.getFileStorageRecord())));
         fileStroageRecord.init();
         IFileNameMapping fileNameMapping = fileNameMappingList.stream().filter(obj -> obj.getClass().getName().equals(properties.getFileNameMapping())).findAny().orElseThrow(() -> new FileStorageRuntimeException(String.format("未找到%s对应的bean，无法加载IFileNameMapping！", properties.getFileNameMapping())));
-        return new FileStorageService(new CopyOnWriteArrayList<>(fileStorageLists.stream().flatMap(Collection::stream).toList()), fileStroageRecord, fileNameMapping);
+        return new FileStorageService(new CopyOnWriteArrayList<>(fileStorageLists.stream().flatMap(Collection::stream).collect(Collectors.toList())), fileStroageRecord, fileNameMapping);
     }
 
     private final BiFunction<ServerRequest, FileStorageService, ServerResponse> listFunction = (request, service) -> {
