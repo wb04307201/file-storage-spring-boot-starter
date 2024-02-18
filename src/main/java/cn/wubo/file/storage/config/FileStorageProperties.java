@@ -19,6 +19,10 @@ import java.util.List;
 @Data
 @ConfigurationProperties(prefix = "file.storage")
 public class FileStorageProperties {
+    private String defaultAlias;
+    private String defaultPath;
+    private Boolean enableWeb = Boolean.TRUE;
+    private Boolean enableRest = Boolean.TRUE;
     private String fileStorageRecord = "cn.wubo.file.storage.record.impl.MemFileStroageRecordImpl";
     private String fileNameMapping = "cn.wubo.file.storage.file_name_mapping.impl.RandomFileNameMappingImpl";
     private List<Local> local = new ArrayList<>();

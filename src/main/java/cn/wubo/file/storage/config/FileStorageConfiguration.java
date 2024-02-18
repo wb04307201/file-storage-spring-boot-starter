@@ -20,25 +20,26 @@ import cn.wubo.file.storage.platform.tencentCOS.TencentCOSFileStorage;
 import cn.wubo.file.storage.platform.webDAV.WebDAVFileStorage;
 import cn.wubo.file.storage.record.IFileStroageRecord;
 import cn.wubo.file.storage.record.impl.MemFileStroageRecordImpl;
+import cn.wubo.file.storage.result.Result;
 import cn.wubo.file.storage.utils.IoUtils;
 import cn.wubo.file.storage.utils.PageUtils;
+import jakarta.servlet.http.Part;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.function.*;
-import org.springframework.web.util.HtmlUtils;
+import org.springframework.util.StringUtils;
+import org.springframework.web.servlet.function.RequestPredicates;
+import org.springframework.web.servlet.function.RouterFunction;
+import org.springframework.web.servlet.function.RouterFunctions;
+import org.springframework.web.servlet.function.ServerResponse;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.BiFunction;
 
 @Configuration
 @EnableConfigurationProperties({FileStorageProperties.class})
@@ -148,34 +149,34 @@ public class FileStorageConfiguration {
         return new FileStorageService(new CopyOnWriteArrayList<>(fileStorageLists.stream().flatMap(Collection::stream).toList()), fileStroageRecord, fileNameMapping);
     }
 
-    private final BiFunction<ServerRequest, FileStorageService, ServerResponse> listFunction = (request, service) -> {
-        String contextPath = request.requestPath().contextPath().value();
-        Map<String, Object> data = new HashMap<>();
-        FileInfo fileInfo = new FileInfo();
-        if (HttpMethod.POST.equals(request.method())) {
-            MultiValueMap<String, String> params = request.params();
-            fileInfo.setPlatform(params.getFirst("platform"));
-            fileInfo.setAlias(params.getFirst("alias"));
-            fileInfo.setOriginalFilename(params.getFirst("originalFilename"));
-        }
-        data.put("list", service.list(fileInfo));
-        data.put("contextPath", contextPath);
-        fileInfo.setAlias(HtmlUtils.htmlEscape(fileInfo.getAlias() == null ? "" : fileInfo.getAlias()));
-        fileInfo.setOriginalFilename(HtmlUtils.htmlEscape(fileInfo.getOriginalFilename() == null ? "" : fileInfo.getOriginalFilename()));
-        data.put("query", fileInfo);
-        return ServerResponse.ok().contentType(MediaType.TEXT_HTML).body(PageUtils.write("list.ftl", data));
-    };
-
     @Bean("wb04307201FileStorageRouter")
     public RouterFunction<ServerResponse> fileStorageRouter(FileStorageService fileStorageService) {
-        return RouterFunctions.route().GET("/file/storage/list", RequestPredicates.accept(MediaType.TEXT_HTML), request -> listFunction.apply(request, fileStorageService)).POST("/file/storage/list", RequestPredicates.accept(MediaType.APPLICATION_FORM_URLENCODED), request -> listFunction.apply(request, fileStorageService)).GET("/file/storage/delete", RequestPredicates.accept(MediaType.TEXT_HTML), request -> {
-            Optional<String> optionalId = request.param("id");
-            if (optionalId.isPresent()) fileStorageService.delete(optionalId.get());
-            else throw new IllegalArgumentException("请求参数id不能为空");
-            return listFunction.apply(request, fileStorageService);
-        }).GET("/file/storage/download", request -> {
-            Optional<String> optionalId = request.param("id");
-            if (optionalId.isPresent()) {
+        RouterFunctions.Builder builder = RouterFunctions.route();
+        if (properties.getEnableWeb() && properties.getEnableRest()) {
+            builder.GET("/file/storage/list", RequestPredicates.accept(MediaType.TEXT_HTML), request -> {
+                Map<String, Object> data = new HashMap<>();
+                data.put("contextPath", request.requestPath().contextPath().value());
+                return ServerResponse.ok().contentType(MediaType.TEXT_HTML).body(PageUtils.write("list.ftl", data));
+            });
+        }
+        if (properties.getEnableRest()) {
+            builder.POST("/file/storage/list", request -> {
+                FileInfo fileInfo = request.body(FileInfo.class);
+                return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Result.success(fileStorageService.list(fileInfo)));
+            }).POST("/file/storage/upload", request -> {
+                Part part = request.multipartData().getFirst("file");
+                if (!StringUtils.hasText(properties.getDefaultAlias()))
+                    throw new FileStorageRuntimeException("请配置defaultAlias属性!");
+                if (!StringUtils.hasText(properties.getDefaultPath()))
+                    throw new FileStorageRuntimeException("请配置defaultPath属性!");
+                return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Result.success(fileStorageService.save(new MultipartFileStorage(part.getSubmittedFileName(), null, null, part.getInputStream()).setAlias(properties.getDefaultAlias()).setPath(properties.getDefaultPath()))));
+            }).GET("/file/storage/delete", request -> {
+                Optional<String> optionalId = request.param("id");
+                if (optionalId.isEmpty()) throw new IllegalArgumentException("请求参数id不能为空");
+                return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Result.success(fileStorageService.delete(optionalId.get())));
+            }).GET("/file/storage/download", request -> {
+                Optional<String> optionalId = request.param("id");
+                if (optionalId.isEmpty()) throw new IllegalArgumentException("请求参数id不能为空");
                 MultipartFileStorage file = fileStorageService.download(optionalId.get());
                 return ServerResponse.ok().contentType(MediaType.parseMediaType(file.getContentType())).contentLength(file.getSize()).header("Content-Disposition", "attachment;filename=" + new String(Objects.requireNonNull(file.getOriginalFilename()).getBytes(), StandardCharsets.ISO_8859_1)).build((req, res) -> {
                     try (OutputStream os = res.getOutputStream()) {
@@ -183,9 +184,10 @@ public class FileStorageConfiguration {
                     } catch (IOException e) {
                         throw new FileStorageRuntimeException(e.getMessage(), e);
                     }
-                    return new ModelAndView();
+                    return null;
                 });
-            } else throw new IllegalArgumentException("请求参数id不能为空");
-        }).build();
+            });
+        }
+        return builder.build();
     }
 }
