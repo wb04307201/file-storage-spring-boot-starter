@@ -103,7 +103,6 @@
         var inst = table.render({
             elem: '#table',
             cols: [[ //标题栏
-                {type: 'checkbox', fixed: 'left'},
                 {type: 'numbers', fixed: 'left'},
                 {field: 'id', title: 'ID', width: 150, fixed: 'left', hide: true},
                 {field: 'platform', title: '平台', width: 200},
