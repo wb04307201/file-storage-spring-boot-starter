@@ -171,13 +171,11 @@ public class FileStorageConfiguration {
                     throw new FileStorageRuntimeException("请配置defaultPath属性!");
                 return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Result.success(fileStorageService.save(new MultipartFileStorage(part.getSubmittedFileName(), null, null, part.getInputStream()).setAlias(properties.getDefaultAlias()).setPath(properties.getDefaultPath()))));
             }).GET("/file/storage/delete", request -> {
-                Optional<String> optionalId = request.param("id");
-                if (optionalId.isEmpty()) throw new IllegalArgumentException("请求参数id不能为空");
-                return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Result.success(fileStorageService.delete(optionalId.get())));
+                String id = request.param("id").orElseThrow(() -> new IllegalArgumentException("请求参数id不能为空"));
+                return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Result.success(fileStorageService.delete(id)));
             }).GET("/file/storage/download", request -> {
-                Optional<String> optionalId = request.param("id");
-                if (optionalId.isEmpty()) throw new IllegalArgumentException("请求参数id不能为空");
-                MultipartFileStorage file = fileStorageService.download(optionalId.get());
+                String id = request.param("id").orElseThrow(() -> new IllegalArgumentException("请求参数id不能为空"));
+                MultipartFileStorage file = fileStorageService.download(id);
                 return ServerResponse.ok().contentType(MediaType.parseMediaType(file.getContentType())).contentLength(file.getSize()).header("Content-Disposition", "attachment;filename=" + new String(Objects.requireNonNull(file.getOriginalFilename()).getBytes(), StandardCharsets.ISO_8859_1)).build((req, res) -> {
                     try (OutputStream os = res.getOutputStream()) {
                         IoUtils.writeToStream(file.getBytes(), os);
