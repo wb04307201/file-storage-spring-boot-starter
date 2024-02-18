@@ -23,7 +23,7 @@
                     <option value="" selected>全部</option>
                     <option value="Local">本地</option>
                     <option value="AmazonS3">AmazonS3</option>
-                    <option value="MinIO"></option>
+                    <option value="MinIO">MinIO</option>
                     <option value="HuaweiOBS">HuaweiOBS</option>
                     <option value="BaiduBOS">BaiduBOS</option>
                     <option value="AliyunOSS">AliyunOSS</option>
