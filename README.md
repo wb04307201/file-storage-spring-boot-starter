@@ -23,7 +23,7 @@
 ```
 
 ## 第二步 引入jar
-1.1.0版本后升级到jdk 17 SpringBoot 3.2.0
+1.1.0版本后升级到jdk17 SpringBoot3+
 继续使用jdk 8请查看jdk8分支
 ```xml
 <dependency>
