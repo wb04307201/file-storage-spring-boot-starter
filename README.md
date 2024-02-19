@@ -207,7 +207,6 @@ public class H2FileStroageRecordImpl implements IFileStroageRecord {
 }
 ```
 
-并添加配置指向类
 ```yaml
 file:
   storage:
