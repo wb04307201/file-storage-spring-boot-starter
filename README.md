@@ -1,18 +1,103 @@
 # file-storage-spring-boot-starter
 
 [![](https://jitpack.io/v/com.gitee.wb04307201/file-storage-spring-boot-starter.svg)](https://jitpack.io/#com.gitee.wb04307201/file-storage-spring-boot-starter)
+[![star](https://gitee.com/wb04307201/file-storage-spring-boot-starter/badge/star.svg?theme=dark)](https://gitee.com/wb04307201/file-storage-spring-boot-starter)
+[![fork](https://gitee.com/wb04307201/file-storage-spring-boot-starter/badge/fork.svg?theme=dark)](https://gitee.com/wb04307201/file-storage-spring-boot-starter)
+[![star](https://img.shields.io/github/stars/wb04307201/file-storage-spring-boot-starter)](https://github.com/wb04307201/file-storage-spring-boot-starter)
+[![fork](https://img.shields.io/github/forks/wb04307201/file-storage-spring-boot-starter)](https://github.com/wb04307201/file-storage-spring-boot-starter)  
+![MIT](https://img.shields.io/badge/License-Apache2.0-blue.svg) ![JDK](https://img.shields.io/badge/JDK-17+-green.svg) ![SpringBoot](https://img.shields.io/badge/Srping%20Boot-3+-green.svg)
 
+
+## 简介
 > 一个适配多平台文件存储的中间件  
 > 可通过简单的配置既可集成到springboot中  
 > 将文件存储到本地、AmazonS3、MinIO、华为云OBS、百度云 BOS、阿里云OSS、腾讯云COS、WebDAV、Git等平台
+
+## 支持的存储类型
+已集成的存储方式
+
+| 存储方式                                                         | 
+|--------------------------------------------------------------|
+| 本地存储                                                         |
+| Amazon S3(可兼容其他存储平台)                                         |
+| MinIO                                                        |
+| 华为云 OBS                                                      |
+| 百度云 BOS                                                      |
+| 阿里云 OSS                                                      |
+| 腾讯云 COS                                                      |
+| WebDAV(可通过[alist](https://github.com/alist-org/alist)支持多种网盘) |
+| Git                                                          |
+
+Amazon S3 SDK 与其他平台兼容性
+
+| 平台          | 说明                                                                                                                        |
+|-------------|---------------------------------------------------------------------------------------------------------------------------|
+| MinIO       | [查看](https://www.minio.org.cn/docs/minio/kubernetes/upstream/index.html)                                                  |
+| 阿里云 OSS     | [查看](https://help.aliyun.com/document_detail/64919.html#title-cds-fai-yxp)                                                |
+| 华为云 OBS     | [查看](https://support.huaweicloud.com/sdk-java-devg-obs/obs_21_2123.html)                                                  |
+| 七牛云 Kodo    | [查看](https://developer.qiniu.com/kodo/4086/amazon-s3-compatible)                                                          |
+| 腾讯云 COS     | [查看](https://cloud.tencent.com/document/product/436/37421)                                                                |
+| 百度云 BOS     | [查看](https://cloud.baidu.com/doc/BOS/s/Fjwvyq9xo)                                                                         |
+| 金山云 KS3     | [查看](https://docs.ksyun.com/documents/959)                                                                                |
+| 美团云 MSS     | [查看](https://www.mtyun.com/doc/products/storage/mss/zhu-yao-gong-neng#%E5%85%BC%E5%AE%B9%20AWS%20S3%20%E5%8D%8F%E8%AE%AE) |
+| 京东云 OSS     | [查看](https://docs.jdcloud.com/cn/object-storage-service/compatibility-api-overview)                                       |
+| 天翼云 OOS     | [查看](https://www.ctyun.cn/h5/help2/10000101/10001711)                                                                     |
+| 移动云 EOS     | [查看](https://ecloud.10086.cn/op-help-center/doc/article/24569)                                                            |
+| 沃云 OSS      | [查看](https://support.woyun.cn/document.html?id=133&arcid=127)                                                             |
+| 网易数帆 NOS    | [查看](https://www.163yun.com/help/documents/89796157866430464)                                                             |
+| Ucloud US3  | [查看](https://docs.ucloud.cn/ufile/s3/s3_introduction)                                                                     |
+| 青云 QingStor | [查看](https://docs.qingcloud.com/qingstor/s3/)                                                                             |
+| 平安云 OBS     | [查看](https://yun.pingan.com/ssr/help/storage/obs/OBS_SDK_.Java_SDK_)                                                      |
+| 首云 OSS      | [查看](http://www.capitalonline.net.cn/zh-cn/service/distribution/oss-new/#product-adv)                                     |
+| IBM COS     | [查看](https://cloud.ibm.com/docs/cloud-object-storage?topic=cloud-object-storage-compatibility-api)                        |
+| 又拍云 USS     | [查看](https://help.upyun.com/knowledge-base/aws-s3%e5%85%bc%e5%ae%b9/)                                                     |
+
+Alist 兼容的存储方式
+
+| 存储方式                                   |
+|----------------------------------------|
+| 本地存储                                   |
+| 阿里云盘                                   |
+| OneDrive / Sharepoint（国际版, 世纪互联,de,us） |
+| 天翼云盘 (个人云, 家庭云)                        |
+| GoogleDrive                            |
+| 123云盘                                  |
+| FTP / SFTP                             |
+| PikPak                                 |
+| S3                                     |
+| Seafile                                |
+| 又拍云对象存储                                |
+| WebDav(支持无API的OneDrive/SharePoint)     |
+| Teambition（中国，国际）                      |
+| 分秒帧                                    |
+| 和彩云 (个人云, 家庭云)                         |
+| Yandex.Disk                            |
+| 百度网盘                                   |
+| UC网盘                                   |
+| 夸克网盘                                   |
+| 迅雷网盘                                   |
+| 蓝奏云                                    |
+| 蓝奏云优享版                                 |
+| 阿里云盘分享                                 |
+| 谷歌相册                                   |
+| Mega.nz                                |
+| 一刻相册                                   |
+| SMB                                    |
+| 115                                    |
+| Cloudreve                              |
+| Dropbox                                |
+| 飞机盘                                    |
+| 多吉云                                    |
 
 ## 代码示例
 1. 使用[多平台文件存储](https://gitee.com/wb04307201/file-storage-spring-boot-starter)、[实体SQL工具](https://gitee.com/wb04307201/sql-util)实现的[文件存储Demo](https://gitee.com/wb04307201/file-storage-demo)
 2. 使用[文档在线预览](https://gitee.com/wb04307201/file-preview-spring-boot-starter)、[多平台文件存储](https://gitee.com/wb04307201/file-storage-spring-boot-starter)、[实体SQL工具](https://gitee.com/wb04307201/sql-util)实现的[文件预览Demo](https://gitee.com/wb04307201/file-preview-demo)
 3. 使用[文档在线预览](https://gitee.com/wb04307201/file-preview-spring-boot-starter)、[多平台文件存储](https://gitee.com/wb04307201/file-storage-spring-boot-starter)、[实体SQL工具](https://gitee.com/wb04307201/sql-util)实现的[文件预览VUE Demo](https://gitee.com/wb04307201/file-preview-vue)
 
-## 第一步 增加 JitPack 仓库
 
+## 快速开始
+### 引入依赖
+增加 JitPack 仓库
 ```xml
 <repositories>
     <repository>
@@ -22,7 +107,6 @@
 </repositories>
 ```
 
-## 第二步 引入jar
 1.1.0版本后升级到jdk17 SpringBoot3+
 继续使用jdk 8请查看jdk8分支
 ```xml
@@ -33,7 +117,7 @@
 </dependency>
 ```
 
-## 第三步 在启动类上加上`@EnableFileStorage`注解
+### 在启动类上加上`@EnableFileStorage`注解
 ```java
 @EnableFileStorage
 @SpringBootApplication
@@ -46,7 +130,7 @@ public class FileStorageDemoApplication {
 }
 ```
 
-## 第四步 `application.yml`配置文件中添加以下相关配置，可以配置多个存储
+### `application.yml`配置文件中添加以下相关配置，可以配置多个存储
 ```yaml
 file:
   storage: #文件存储配置，不使用的情况下可以不写
@@ -127,37 +211,15 @@ file:
         alias: git-1 # 别名
 ```
 
-Amazon S3 SDK 与其他平台兼容性
-
-| 平台          | 说明                                                                                                                        |
-|-------------|---------------------------------------------------------------------------------------------------------------------------|
-| MinIO       | [查看](https://www.minio.org.cn/docs/minio/kubernetes/upstream/index.html)                                                  |
-| 阿里云 OSS     | [查看](https://help.aliyun.com/document_detail/64919.html#title-cds-fai-yxp)                                                |
-| 华为云 OBS     | [查看](https://support.huaweicloud.com/sdk-java-devg-obs/obs_21_2123.html)                                                  |
-| 七牛云 Kodo    | [查看](https://developer.qiniu.com/kodo/4086/amazon-s3-compatible)                                                          |
-| 腾讯云 COS     | [查看](https://cloud.tencent.com/document/product/436/37421)                                                                |
-| 百度云 BOS     | [查看](https://cloud.baidu.com/doc/BOS/s/Fjwvyq9xo)                                                                         |
-| 金山云 KS3     | [查看](https://docs.ksyun.com/documents/959)                                                                                |
-| 美团云 MSS     | [查看](https://www.mtyun.com/doc/products/storage/mss/zhu-yao-gong-neng#%E5%85%BC%E5%AE%B9%20AWS%20S3%20%E5%8D%8F%E8%AE%AE) |
-| 京东云 OSS     | [查看](https://docs.jdcloud.com/cn/object-storage-service/compatibility-api-overview)                                       |
-| 天翼云 OOS     | [查看](https://www.ctyun.cn/h5/help2/10000101/10001711)                                                                     |
-| 移动云 EOS     | [查看](https://ecloud.10086.cn/op-help-center/doc/article/24569)                                                            |
-| 沃云 OSS      | [查看](https://support.woyun.cn/document.html?id=133&arcid=127)                                                             |
-| 网易数帆 NOS    | [查看](https://www.163yun.com/help/documents/89796157866430464)                                                             |
-| Ucloud US3  | [查看](https://docs.ucloud.cn/ufile/s3/s3_introduction)                                                                     |
-| 青云 QingStor | [查看](https://docs.qingcloud.com/qingstor/s3/)                                                                             |
-| 平安云 OBS     | [查看](https://yun.pingan.com/ssr/help/storage/obs/OBS_SDK_.Java_SDK_)                                                      |
-| 首云 OSS      | [查看](http://www.capitalonline.net.cn/zh-cn/service/distribution/oss-new/#product-adv)                                     |
-| IBM COS     | [查看](https://cloud.ibm.com/docs/cloud-object-storage?topic=cloud-object-storage-compatibility-api)                        |
-| 又拍云 USS     | [查看](https://help.upyun.com/knowledge-base/aws-s3%e5%85%bc%e5%ae%b9/)                                                     |
-
-## 第五步 访问内置界面使用文件上传
+### 访问内置界面使用文件上传
 上传的文件可通过http://ip:端口/file/storage/list进行查看  
 注1：如配置了context-path需要在地址中对应添加  
 注2：使用内置界面，默认使用的alias和path通过defaultAlias和defaultPath进行配置
 ![img.png](img.png)
 
-## 其他1：实际使用中，可通过配置和实现文件存储记录接口方法将数据持久化到数据库中
+
+## 高级
+### 如何通过配置和实现文件存储记录接口方法将数据持久化到数据库中
 继承IFileStroageRecord并实现方法，例如
 
 ```java
@@ -213,7 +275,7 @@ file:
     file-storage-record: cn.wubo.file.storage.demo.H2FileStroageRecordImpl
 ```
 
-## 其他2：通过内置Rest接口实现自定义页面
+### 如何通过内置Rest接口实现自定义页面
 ```html
 <!DOCTYPE html>
 <html lang="en">
@@ -386,7 +448,7 @@ file:
 </html>
 ```
 
-## 其他3：通过注入FileStorageService实现自定义Rest接口和自定义页面
+### 如何通过注入FileStorageService实现自定义Rest接口和自定义页面
 注意：使用该方式，可更加灵活的使用alias和path属性
 ```java
 @Controller
@@ -615,25 +677,7 @@ public class Demo2Controller {
 </html>
 ```
 
-## 其他4：docker安装MinIO
-docker安装minio 详细内容请查看 [Download](https://min.io/download#/docker) 或者 [MinIO Object Storage for Container](https://min.io/docs/minio/container/index.html)
-```bash
-docker run -p 9000:9000 -p 9090:9090 --name minio -v D:\minio\data:/data -e "MINIO_ROOT_USER=ROOTUSER" -e "MINIO_ROOT_PASSWORD=CHANGEME123" quay.io/minio/minio server /data --console-address ":9090"
-```
-用户名 ROOTUSER 密码 CHANGEME123
-
-## 其他5：WebDAV——通过Alist支持更多存储平台
-[Alist --一个支持多种存储的文件列表程序](https://alist.nn.ci)  
-[sardine --an easy to use webdav client for java](https://github.com/lookfirst/sardine)
-
-```bash
-# docker安装
-docker run -d --restart=always -v /etc/alist:/opt/alist/data -p 5244:5244 -e PUID=0 -e PGID=0 -e UMASK=022 --name="alist" xhofe/alist:latest
-# 查看用户名和密码
-docker exec -it alist ./alist admin
-```
-
-## 其他6：自定义存储文件命名方法
+## 如何自定义存储文件命名方法
 ```yaml
 file:
   storage:
@@ -659,5 +703,23 @@ public class MD5FileNameMappingImpl implements IFileNameMapping {
         }
     }
 }
+```
+
+### 如何通过docker安装MinIO
+docker安装minio 详细内容请查看 [Download](https://min.io/download#/docker) 或者 [MinIO Object Storage for Container](https://min.io/docs/minio/container/index.html)
+```bash
+docker run -p 9000:9000 -p 9090:9090 --name minio -v D:\minio\data:/data -e "MINIO_ROOT_USER=ROOTUSER" -e "MINIO_ROOT_PASSWORD=CHANGEME123" quay.io/minio/minio server /data --console-address ":9090"
+```
+用户名 ROOTUSER 密码 CHANGEME123
+
+### 如何通过Alist支持更多存储平台
+[Alist --一个支持多种存储的文件列表程序](https://alist.nn.ci)  
+[sardine --an easy to use webdav client for java](https://github.com/lookfirst/sardine)
+
+```bash
+# docker安装
+docker run -d --restart=always -v /etc/alist:/opt/alist/data -p 5244:5244 -e PUID=0 -e PGID=0 -e UMASK=022 --name="alist" xhofe/alist:latest
+# 查看用户名和密码
+docker exec -it alist ./alist admin
 ```
 
