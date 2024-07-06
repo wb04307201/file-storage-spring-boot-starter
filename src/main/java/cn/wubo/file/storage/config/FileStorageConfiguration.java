@@ -149,33 +149,71 @@ public class FileStorageConfiguration {
         return new FileStorageService(new CopyOnWriteArrayList<>(fileStorageLists.stream().flatMap(Collection::stream).toList()), fileStroageRecord, fileNameMapping);
     }
 
+    /**
+     * 配置文件存储的路由功能。
+     *
+     * @param fileStorageService 文件存储服务，用于处理文件的存储和检索操作。
+     * @return RouterFunction 对象，用于路由文件存储相关的HTTP请求。
+     */
     @Bean("wb04307201FileStorageRouter")
     public RouterFunction<ServerResponse> fileStorageRouter(FileStorageService fileStorageService) {
+        // 创建路由函数构建器
         RouterFunctions.Builder builder = RouterFunctions.route();
+
+        // 当Web和REST接口都启用时，配置HTML页面的路由
         if (properties.getEnableWeb() && properties.getEnableRest()) {
             builder.GET("/file/storage/list", RequestPredicates.accept(MediaType.TEXT_HTML), request -> {
+                // 构建包含上下文路径的数据Map
                 Map<String, Object> data = new HashMap<>();
                 data.put("contextPath", request.requestPath().contextPath().value());
+                // 返回渲染后的HTML页面
                 return ServerResponse.ok().contentType(MediaType.TEXT_HTML).body(PageUtils.write("list.ftl", data));
             });
         }
+
+        // 配置REST接口的路由
         if (properties.getEnableRest()) {
+            // 配置列出文件的路由
             builder.POST("/file/storage/list", request -> {
                 FileInfo fileInfo = request.body(FileInfo.class);
+                // 返回文件列表
                 return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Result.success(fileStorageService.list(fileInfo)));
-            }).POST("/file/storage/upload", request -> {
+            });
+
+            // 配置上传文件的路由
+            builder.POST("/file/storage/upload", request -> {
                 Part part = request.multipartData().getFirst("file");
+                // 校验配置项defaultAlias和defaultPath是否为空，为空则抛出异常
                 if (!StringUtils.hasText(properties.getDefaultAlias()))
                     throw new FileStorageRuntimeException("请配置defaultAlias属性!");
                 if (!StringUtils.hasText(properties.getDefaultPath()))
                     throw new FileStorageRuntimeException("请配置defaultPath属性!");
-                return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Result.success(fileStorageService.save(new MultipartFileStorage(part.getSubmittedFileName(), null, null, part.getInputStream()).setAlias(properties.getDefaultAlias()).setPath(properties.getDefaultPath()))));
-            }).GET("/file/storage/delete", request -> {
+                // 保存文件并返回保存结果
+                return ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(
+                                Result.success(
+                                        fileStorageService.save(
+                                                new MultipartFileStorage(part.getSubmittedFileName(), null, null, part.getInputStream())
+                                                .setAlias(properties.getDefaultAlias())
+                                                .setPath(properties.getDefaultPath())
+                                        )
+                                )
+                        );
+            });
+
+            // 配置删除文件的路由
+            builder.GET("/file/storage/delete", request -> {
                 String id = request.param("id").orElseThrow(() -> new IllegalArgumentException("请求参数id不能为空"));
+                // 删除文件并返回结果
                 return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(Result.success(fileStorageService.delete(id)));
-            }).GET("/file/storage/download", request -> {
+            });
+
+            // 配置下载文件的路由
+            builder.GET("/file/storage/download", request -> {
                 String id = request.param("id").orElseThrow(() -> new IllegalArgumentException("请求参数id不能为空"));
                 MultipartFileStorage file = fileStorageService.download(id);
+                // 构建文件下载响应
                 return ServerResponse.ok().contentType(MediaType.parseMediaType(file.getContentType())).contentLength(file.getSize()).header("Content-Disposition", "attachment;filename=" + new String(Objects.requireNonNull(file.getOriginalFilename()).getBytes(), StandardCharsets.ISO_8859_1)).build((req, res) -> {
                     try (OutputStream os = res.getOutputStream()) {
                         IoUtils.writeToStream(file.getBytes(), os);
@@ -186,6 +224,8 @@ public class FileStorageConfiguration {
                 });
             });
         }
+
+        // 构建并返回最终的路由函数
         return builder.build();
     }
 }
