@@ -31,7 +31,7 @@
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <version>1.5.6</version>
+                <version>1.5.13</version>
             </dependency>
 
             <dependency>
@@ -65,12 +65,12 @@
             <dependency>
                 <groupId>com.aliyun.oss</groupId>
                 <artifactId>aliyun-sdk-oss</artifactId>
-                <version>3.18.0</version>
+                <version>3.18.3</version>
             </dependency>
             <dependency>
                 <groupId>com.qcloud</groupId>
                 <artifactId>cos_api</artifactId>
-                <version>5.6.219.1</version>
+                <version>5.6.240</version>
             </dependency>
             <dependency>
                 <groupId>com.github.lookfirst</groupId>
@@ -80,7 +80,7 @@
             <dependency>
                 <groupId>org.eclipse.jgit</groupId>
                 <artifactId>org.eclipse.jgit</artifactId>
-                <version>6.10.0.202406032230-r</version>
+                <version>6.10.1.202505221210-r</version>
             </dependency>
             <dependency>
                 <groupId>jakarta.transaction</groupId>
